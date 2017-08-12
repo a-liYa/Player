@@ -48,6 +48,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     @Override
+    protected void onStop() {
+        super.onStop();
+        mPlayerView.releasePlayer();
+    }
+
+    @Override
     public void onClick(View view) {
         switch (R.id.btn_player) {
             case R.id.btn_player:

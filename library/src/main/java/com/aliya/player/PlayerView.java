@@ -105,8 +105,17 @@ public class PlayerView extends FrameLayout {
         }
     }
 
+    public void releasePlayer() {
+        if (player != null) {
+            if (controller != null) {
+                controller.setPlayer(null);
+            }
+            player.release();
+        }
+    }
+
     private final class ComponentListener implements SimpleExoPlayer.VideoListener,
-            TextRenderer.Output{
+            TextRenderer.Output {
 
         // TextRenderer.Output implementation
 

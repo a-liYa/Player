@@ -36,6 +36,7 @@ final class TimeTool {
         playedAdGroups = new boolean[0];
     }
 
+    // 主要复杂在计算Google广告系统的时间问题
     public void calcTime(Player player) {
         position = 0;
         bufferedPosition = 0;

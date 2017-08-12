@@ -1,16 +1,11 @@
 package com.aliya.player;
 
-import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
-import com.aliya.player.utils.VideoUtils;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
@@ -18,6 +13,8 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+
+import static com.aliya.player.utils.VideoUtils.findViewById;
 
 /**
  * Controller
@@ -27,38 +24,24 @@ import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
  */
 public class Controller {
 
-    private ProgressBar buffePrrogress;
+    private ProgressBar bufferProgress;
 
-    private View controlBar;
-
-    private ImageView ivPause;
-
-    private SeekBar seekBar;
-
-    private TextView tvPosition;
-
-    private TextView tvDuration;
-
-    private ImageView ivFullscreen;
+    private ControlBar controlBar;
 
     private ViewGroup parentView;
 
     private Player player;
 
-    private TimeTool timeTool;
-    private final ComponentListener componentListener;
 
-    private final Runnable updateProgressAction = new Runnable() {
-        @Override
-        public void run() {
-            updateProgress();
-        }
-    };
+    private final ComponentListener componentListener;
 
     public Controller(ViewGroup parentView) {
         this.parentView = parentView;
-        timeTool = new TimeTool();
         componentListener = new ComponentListener();
+        controlBar = new ControlBar(this);
+        if (parentView != null) {
+            parentView.setOnClickListener(componentListener);
+        }
     }
 
     public
@@ -68,40 +51,22 @@ public class Controller {
     }
 
     public void onViewCreate() {
-        buffePrrogress = findViewById(R.id.player_buffer_progress);
-        controlBar = findViewById(R.id.player_control_bar);
-        ivPause = findViewById(R.id.player_play_pause);
-        seekBar = findViewById(R.id.player_seek_bar);
-        tvPosition = findViewById(R.id.player_position);
-        tvDuration = findViewById(R.id.player_duration);
-        ivFullscreen = findViewById(R.id.player_full_screen);
-
-        if (ivPause != null) {
-            ivPause.setOnClickListener(componentListener);
-        }
-        if (ivFullscreen != null) {
-            ivFullscreen.setOnClickListener(componentListener);
-        }
+        bufferProgress = findViewById(parentView, R.id.player_buffer_progress);
+        controlBar.bindView(findViewById(parentView, R.id.player_control_bar));
 
     }
 
-
-
-    private void updateProgress() {
-
-        timeTool.calcTime(player);
-
-        if (tvPosition != null) {
-            tvPosition.setText(VideoUtils.formatTime(timeTool.position));
+    private void setBufferProgressVisibility(boolean isVisible) {
+        if (bufferProgress != null) {
+            if (isVisible && bufferProgress.getVisibility() != View.VISIBLE) {
+                bufferProgress.setVisibility(View.VISIBLE);
+            } else if (!isVisible && bufferProgress.getVisibility() != View.INVISIBLE) {
+                bufferProgress.setVisibility(View.INVISIBLE);
+            }
+            if (isVisible) { // 缓冲加载时，隐藏 control bar
+                if (controlBar != null) controlBar.hide();
+            }
         }
-        if (tvDuration != null) {
-            tvDuration.setText(VideoUtils.formatTime(timeTool.duration));
-        }
-
-        // Cancel any pending updates and schedule a new one if necessary.
-        parentView.removeCallbacks(updateProgressAction);
-
-        parentView.postDelayed(updateProgressAction, VideoUtils.calcSyncPeriod(0));
     }
 
     public void setPlayer(SimpleExoPlayer player) {
@@ -116,15 +81,14 @@ public class Controller {
         }
     }
 
-    private <T extends View> T findViewById(@IdRes int id) {
-        if (parentView == null) return null;
+    public Player getPlayer() {
+        return player;
+    }
 
-        View findView = parentView.findViewById(id);
-        if (findView != null) {
-            return (T) findView;
+    public void seekTo(long positionMs) {
+        if (player != null) {
+            player.seekTo(positionMs);
         }
-
-        return null;
     }
 
     private final class ComponentListener implements Player.EventListener, View.OnClickListener {
@@ -132,31 +96,50 @@ public class Controller {
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
 //            updatePlayPauseButton();
-            updateProgress();
+
+            if (playbackState == Player.STATE_BUFFERING) { // 缓冲
+                if (controlBar != null) {
+                    controlBar.stopUpdateProgress();
+                }
+                setBufferProgressVisibility(true);
+            } else if (playbackState == Player.STATE_READY) { // 播放
+                if (controlBar != null) {
+                    controlBar.updateProgress();
+                }
+                setBufferProgressVisibility(false);
+            } else if (playbackState == Player.STATE_ENDED) { // 播完毕
+
+            }
+
+            if (controlBar != null) {
+                controlBar.updatePlayPause(playWhenReady);
+            }
+
         }
 
         @Override
         public void onRepeatModeChanged(int repeatMode) {
-//            updateRepeatModeButton();
-//            updateNavigation();
+            Log.e("TAG", "onRepeatModeChanged " + repeatMode);
         }
 
         @Override
-        public void onPositionDiscontinuity() {
-//            updateNavigation();
-            updateProgress();
+        public void onPositionDiscontinuity() { // position 不连续
+            if (controlBar != null) {
+                controlBar.updateProgress();
+            }
         }
 
         @Override
         public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
             // Do nothing.
+            Log.e("TAG", "onPlaybackParametersChanged ");
         }
 
         @Override
         public void onTimelineChanged(Timeline timeline, Object manifest) {
-//            updateNavigation();
-//            updateTimeBarMode();
-            updateProgress();
+            if (controlBar != null) {
+                controlBar.updateProgress();
+            }
         }
 
         @Override
@@ -167,16 +150,25 @@ public class Controller {
         @Override
         public void onTracksChanged(TrackGroupArray tracks, TrackSelectionArray selections) {
             // Do nothing.
+            Log.e("TAG", "onTracksChanged ");
         }
 
         @Override
         public void onPlayerError(ExoPlaybackException error) {
             // Do nothing.
+            Log.e("TAG", "onPlayerError " + error);
         }
 
         @Override
         public void onClick(View v) {
-//            if (player != null) {
+
+            if (player != null) {
+                if (v == parentView) {
+                    if (bufferProgress == null || bufferProgress.getVisibility() != View.VISIBLE) {
+                        if (controlBar != null) controlBar.switchVisibility();
+                    }
+                }
+            }
 //                if (nextButton == view) {
 //                    next();
 //                } else if (previousButton == view) {
@@ -194,16 +186,10 @@ public class Controller {
 // .getNextRepeatMode(
 //                            player.getRepeatMode(), repeatToggleModes));
 //                }
-//            }
 //            hideAfterTimeout();
-            if (v.getId() == R.id.player_play_pause) {
-                Log.e("TAG", "player_play_pause");
-            } else if (v.getId() == R.id.player_full_screen) {
-                Log.e("TAG", "player_full_screen");
-            }
+
         }
 
     }
-
 
 }

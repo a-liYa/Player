@@ -1,6 +1,8 @@
 package com.aliya.player.utils;
 
 import android.content.Context;
+import android.support.annotation.IdRes;
+import android.view.View;
 
 import java.math.RoundingMode;
 import java.text.NumberFormat;
@@ -20,7 +22,8 @@ public class VideoUtils {
      * @return delayMs
      */
     public static long calcSyncPeriod(long position) {
-        return 1000 - (position % 1000);
+        long delayMs = 1000 - (position % 1000);
+        return delayMs < 200 ? delayMs + 200 : delayMs;
     }
 
     /**
@@ -89,6 +92,17 @@ public class VideoUtils {
             return true;
         }
         return false;
+    }
+
+    public final static <T extends View> T findViewById(View parent, @IdRes int id) {
+        if (parent == null) return null;
+
+        View findView = parent.findViewById(id);
+        if (findView != null) {
+            return (T) findView;
+        }
+
+        return null;
     }
 
 }

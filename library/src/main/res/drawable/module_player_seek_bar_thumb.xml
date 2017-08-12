@@ -1,9 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="oval">
-    <size
-        android:width="10dp"
-        android:height="10dp" />
-    <solid android:color="@color/module_player_seek_bar_thumb" />
-
-</shape>
+<selector xmlns:android="http://schemas.android.com/apk/res/android" android:constantSize="false">
+    <item android:state_pressed="true">
+        <shape android:shape="oval">
+            <size android:width="12dp" android:height="12dp" />
+            <solid android:color="@color/module_player_seek_bar_thumb" />
+        </shape>
+    </item>
+    <item android:state_pressed="false">
+        <shape android:shape="oval">
+            <size android:width="12dp" android:height="12dp" />
+            <stroke android:width="2dp" android:color="@android:color/transparent" />
+            <solid android:color="@color/module_player_seek_bar_thumb" />
+        </shape>
+    </item>
+</selector>

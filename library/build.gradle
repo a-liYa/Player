@@ -27,7 +27,6 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:26.+'
 
     compile 'com.google.android.exoplayer:exoplayer-core:' + exoplayerVersion
     compile 'com.google.android.exoplayer:exoplayer-dash:' + exoplayerVersion
@@ -36,7 +35,7 @@ dependencies {
 }
 
 ext {
-    publishArtifact = 'bannerview'
+    publishArtifact = 'player'
     publishVersion = vName // 发布到Jcenter的版本号
     publishDesc = 'BannerView 实现自动无限轮播的 ViewPager'
     publishWebsite = 'https://github.com/a-liYa/BannerView'

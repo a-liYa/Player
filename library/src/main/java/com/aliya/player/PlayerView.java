@@ -11,15 +11,9 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.aliya.player.ui.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.ExoPlaybackException;
-import com.google.android.exoplayer2.PlaybackParameters;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.Timeline;
-import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.text.TextRenderer;
-import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
 import java.util.List;
 
@@ -88,7 +82,6 @@ public class PlayerView extends FrameLayout {
         }
 
         if (this.player != null) {
-            this.player.removeListener(componentListener);
             this.player.clearTextOutput(componentListener);
             this.player.clearVideoListener(componentListener);
 
@@ -109,12 +102,11 @@ public class PlayerView extends FrameLayout {
 
             player.setVideoListener(componentListener);
             player.setTextOutput(componentListener);
-            player.addListener(componentListener);
         }
     }
 
     private final class ComponentListener implements SimpleExoPlayer.VideoListener,
-            TextRenderer.Output, Player.EventListener {
+            TextRenderer.Output{
 
         // TextRenderer.Output implementation
 
@@ -142,47 +134,6 @@ public class PlayerView extends FrameLayout {
 //            }
         }
 
-        @Override
-        public void onTracksChanged(TrackGroupArray tracks, TrackSelectionArray selections) {
-//            updateForCurrentTrackSelections();
-        }
-
-        // Player.EventListener implementation
-
-        @Override
-        public void onLoadingChanged(boolean isLoading) {
-            // Do nothing.
-        }
-
-        @Override
-        public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
-//            maybeShowController(false);
-        }
-
-        @Override
-        public void onRepeatModeChanged(int repeatMode) {
-            // Do nothing.
-        }
-
-        @Override
-        public void onPlayerError(ExoPlaybackException e) {
-            // Do nothing.
-        }
-
-        @Override
-        public void onPositionDiscontinuity() {
-            // Do nothing.
-        }
-
-        @Override
-        public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-            // Do nothing.
-        }
-
-        @Override
-        public void onTimelineChanged(Timeline timeline, Object manifest) {
-            // Do nothing.
-        }
 
     }
 

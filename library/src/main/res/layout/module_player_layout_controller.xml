@@ -11,6 +11,7 @@
         android:layout_gravity="center"
         android:indeterminateDrawable="@drawable/module_player_buffer_progress"
         android:indeterminateDuration="2000"
+        android:visibility="gone"
         android:minHeight="50dp"
         android:minWidth="50dp" />
 
@@ -40,8 +41,8 @@
             android:max="1000"
             android:maxHeight="2dp"
             android:minHeight="2dp"
-            android:paddingEnd="5dp"
-            android:paddingStart="5dp"
+            android:paddingEnd="6dp"
+            android:paddingStart="6dp"
             android:progressDrawable="@drawable/module_player_seek_bar_progress"
             android:thumb="@drawable/module_player_seek_bar_thumb" />
 

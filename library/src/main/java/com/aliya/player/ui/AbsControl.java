@@ -11,9 +11,17 @@ import com.aliya.player.Control;
 abstract class AbsControl implements Control {
 
     protected Controller controller;
+    protected VisibilityListener visibilityListener;
 
     public AbsControl(Controller controller) {
         this.controller = controller;
     }
 
+    public VisibilityListener getVisibilityListener() {
+        return visibilityListener;
+    }
+
+    public void setVisibilityListener(VisibilityListener visibilityListener) {
+        this.visibilityListener = visibilityListener;
+    }
 }

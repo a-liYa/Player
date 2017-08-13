@@ -36,10 +36,16 @@ public class ErrorControl extends AbsControl {
 
     @Override
     public void setVisibility(boolean isVisible) {
+        boolean oldVisible = isVisible();
         if (isVisible) {
             show();
         } else {
             hide();
+        }
+        if (oldVisible != isVisible) {
+            if (visibilityListener != null) {
+                visibilityListener.onVisibilityChange(this, isVisible);
+            }
         }
     }
 

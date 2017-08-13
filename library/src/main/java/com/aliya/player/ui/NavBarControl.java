@@ -176,7 +176,13 @@ public class NavBarControl extends AbsControl {
     @Override
     public void setVisibility(boolean isVisible) {
         if (rootView != null) {
+            boolean oldVisible = isVisible();
             rootView.setVisibility(isVisible ? VISIBLE : GONE);
+            if (oldVisible != isVisible) {
+                if (visibilityListener != null) {
+                    visibilityListener.onVisibilityChange(this, isVisible);
+                }
+            }
             if (isVisible) {
                 updateProgress();
                 hideAfterTimeout();
@@ -201,6 +207,7 @@ public class NavBarControl extends AbsControl {
         return isVisible();
     }
 
+    @Override
     public boolean isVisible() {
         return rootView.getVisibility() == VISIBLE;
     }

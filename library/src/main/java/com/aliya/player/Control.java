@@ -16,4 +16,16 @@ public interface Control {
 
     void setVisibility(boolean isVisible);
 
+    /**
+     * Listener to be notified about changes of the visibility of the UI control.
+     */
+    interface VisibilityListener {
+
+        /**
+         * Called when the visibility changes.
+         */
+        void onVisibilityChange(Control control, boolean isVisible);
+
+    }
+
 }

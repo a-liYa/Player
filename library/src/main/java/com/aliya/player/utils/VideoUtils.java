@@ -4,6 +4,8 @@ import android.content.Context;
 import android.support.annotation.IdRes;
 import android.view.View;
 
+import com.aliya.player.Control;
+
 import java.math.RoundingMode;
 import java.text.NumberFormat;
 
@@ -103,6 +105,14 @@ public class VideoUtils {
         }
 
         return null;
+    }
+
+    public static void setVisibilityControls(boolean isVisible, Control... controls) {
+        if (controls != null) {
+            for (Control control : controls) {
+                control.setVisibility(isVisible);
+            }
+        }
     }
 
 }

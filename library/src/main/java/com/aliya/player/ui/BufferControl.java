@@ -9,7 +9,7 @@ import android.widget.ProgressBar;
  * @author a_liYa
  * @date 2017/8/13 16:58.
  */
-public class BufferControl extends AbsControl {
+class BufferControl extends AbsControl {
 
     private ProgressBar bufferProgress;
 
@@ -32,10 +32,16 @@ public class BufferControl extends AbsControl {
     @Override
     public void setVisibility(boolean isVisible) {
         if (bufferProgress != null) {
+            boolean oldVisible = isVisible();
             if (isVisible) {
                 bufferProgress.setVisibility(View.VISIBLE);
             } else {
                 bufferProgress.setVisibility(View.INVISIBLE);
+            }
+            if (oldVisible != isVisible) {
+                if (visibilityListener != null) {
+                    visibilityListener.onVisibilityChange(this, isVisible);
+                }
             }
         }
     }

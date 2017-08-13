@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.aliya.player.Control;
 import com.aliya.player.R;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -15,6 +16,7 @@ import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
 import static com.aliya.player.utils.VideoUtils.findViewById;
+import static com.aliya.player.utils.VideoUtils.setVisibilityControls;
 
 /**
  * Controller
@@ -26,7 +28,7 @@ public class Controller {
 
     private BufferControl bufferControl;
     private NavBarControl navBarControl;
-    private ErrorControl errorHolder;
+    private ErrorControl errorControl;
 
     private ViewGroup parentView;
 
@@ -38,7 +40,7 @@ public class Controller {
         this.parentView = parentView;
         componentListener = new ComponentListener();
         navBarControl = new NavBarControl(this);
-        errorHolder = new ErrorControl(this);
+        errorControl = new ErrorControl(this);
         bufferControl = new BufferControl(this);
     }
 
@@ -51,26 +53,30 @@ public class Controller {
     public void onViewCreate() {
         bufferControl.onViewCreate(findViewById(parentView, R.id.player_buffer_progress));
         navBarControl.onViewCreate(findViewById(parentView, R.id.player_control_bar));
-        errorHolder.onViewCreate(findViewById(parentView, R.id.player_stub_play_error));
+        errorControl.onViewCreate(findViewById(parentView, R.id.player_stub_play_error));
+
+        bufferControl.setVisibilityListener(componentListener);
+        navBarControl.setVisibilityListener(componentListener);
+        errorControl.setVisibilityListener(componentListener);
 
         updateControlVisibilityCanSwitch();
     }
 
-    private void setBufferProgressVisibility(boolean isVisible) {
-        if (bufferControl != null) {
-            bufferControl.setVisibility(isVisible);
-        }
-        if (isVisible) { // 缓冲加载时，隐藏 nav bar
-            if (navBarControl != null) navBarControl.setVisibility(false);
-        }
-    }
+//    private void setBufferProgressVisibility(boolean isVisible) {
+//        if (bufferControl != null) {
+//            bufferControl.setVisibility(isVisible);
+//        }
+//        if (isVisible) { // 缓冲加载时，隐藏 nav bar
+//            if (navBarControl != null) navBarControl.setVisibility(false);
+//        }
+//    }
 
     private void updateControlVisibilityCanSwitch() {
         View.OnClickListener listener = componentListener;
         if (bufferControl != null && bufferControl.isVisible()) {
             listener = null;
         }
-        if (errorHolder != null && errorHolder.isVisible()) {
+        if (errorControl != null && errorControl.isVisible()) {
             listener = null;
         }
 
@@ -101,7 +107,8 @@ public class Controller {
         }
     }
 
-    private final class ComponentListener implements Player.EventListener, View.OnClickListener {
+    private final class ComponentListener implements Player.EventListener, View.OnClickListener,
+            Control.VisibilityListener {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
@@ -110,19 +117,17 @@ public class Controller {
                 if (navBarControl != null) {
                     navBarControl.stopUpdateProgress();
                 }
-                setBufferProgressVisibility(true);
+                bufferControl.setVisibility(true);
             } else if (playbackState == Player.STATE_READY) { // 播放
                 if (navBarControl != null) {
                     navBarControl.updateProgress();
                 }
-                setBufferProgressVisibility(false);
+                bufferControl.setVisibility(false);
             } else if (playbackState == Player.STATE_ENDED) { // 播完毕
 
             }
 
-            if (navBarControl != null) {
-                navBarControl.updatePlayPause(playWhenReady);
-            }
+            navBarControl.updatePlayPause(playWhenReady);
 
             updateControlVisibilityCanSwitch();
         }
@@ -165,13 +170,9 @@ public class Controller {
 
         @Override
         public void onPlayerError(ExoPlaybackException error) {
-            if (errorHolder != null) {
-                errorHolder.setVisibility(true);
+            if (errorControl != null) {
+                errorControl.setVisibility(true);
             }
-            if (navBarControl != null) {
-                navBarControl.setVisibility(false);
-            }
-            setBufferProgressVisibility(false);
             updateControlVisibilityCanSwitch();
         }
 
@@ -200,9 +201,18 @@ public class Controller {
 //                            player.getRepeatMode(), repeatToggleModes));
 //                }
 //            hideAfterTimeout();
-
         }
 
+        @Override
+        public void onVisibilityChange(Control control, boolean isVisible) {
+            if (isVisible) {
+                if (control == bufferControl) {
+                    setVisibilityControls(false, navBarControl);
+                } else if (control == errorControl) {
+                    setVisibilityControls(false, navBarControl, bufferControl);
+                }
+            }
+        }
     }
 
 }

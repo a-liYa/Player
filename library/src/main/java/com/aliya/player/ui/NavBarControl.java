@@ -212,10 +212,6 @@ public class NavBarControl extends AbsControl {
         return rootView.getVisibility() == VISIBLE;
     }
 
-    private Player getPlayer() {
-        return controller != null ? controller.getPlayer() : null;
-    }
-
     private final class ComponentListener implements View.OnClickListener,
             SeekBar.OnSeekBarChangeListener, View.OnAttachStateChangeListener {
 

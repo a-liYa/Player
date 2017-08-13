@@ -53,7 +53,7 @@ public class VideoUtils {
         if (time < 0) {
             return "--:--";
         }
-        int totalSeconds = (int) (time / 1000);
+        int totalSeconds = (int) ((time + 500) / 1000);
         int seconds = totalSeconds % 60;
         int minutes = (totalSeconds / 60) % 60;
         int hours = totalSeconds / 3600;

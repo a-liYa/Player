@@ -1,10 +1,10 @@
 package com.aliya.player.ui;
 
-import android.util.Log;
 import android.view.View;
 import android.view.ViewStub;
 
 import com.aliya.player.R;
+import com.google.android.exoplayer2.Player;
 
 /**
  * ErrorControl
@@ -60,8 +60,8 @@ public class ErrorControl extends AbsControl {
                     @Override
                     public void onClick(View view) {
                         if (controller != null) {
-                            Log.e("TAG", "重新播放");
                             hide();
+                            // TODO 待完善
                         }
                     }
                 });

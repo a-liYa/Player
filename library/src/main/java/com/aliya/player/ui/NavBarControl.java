@@ -1,4 +1,4 @@
-package com.aliya.player;
+package com.aliya.player.ui;
 
 import android.os.SystemClock;
 import android.util.Log;
@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.aliya.player.R;
 import com.aliya.player.utils.VideoUtils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
@@ -16,12 +17,12 @@ import static android.view.View.VISIBLE;
 import static com.aliya.player.utils.VideoUtils.findViewById;
 
 /**
- * ControlBar
+ * NavBarControl
  *
  * @author a_liYa
  * @date 2017/8/11 21:29.
  */
-public class ControlBar {
+public class NavBarControl extends AbsControl {
 
     private ImageView ivPause;
 
@@ -35,9 +36,7 @@ public class ControlBar {
 
     private View rootView;
 
-    private Controller controller;
-
-    private TimeTool timeTool;
+    private CalcTime mCalcTime;
     private int showTimeoutMs;
     private long hideAtMs;
     private boolean isAttachedToWindow;
@@ -56,18 +55,18 @@ public class ControlBar {
     private final Runnable hideAction = new Runnable() {
         @Override
         public void run() {
-            hide();
+            setVisibility(false);
         }
     };
 
-    public ControlBar(Controller controller) {
-        this.controller = controller;
+    public NavBarControl(Controller controller) {
+        super(controller);
         showTimeoutMs = DEFAULT_SHOW_TIMEOUT_MS;
-        timeTool = new TimeTool();
+        mCalcTime = new CalcTime();
         componentListener = new ComponentListener();
     }
 
-    public void bindView(View view) {
+    public void onViewCreate(View view) {
 
         if (rootView != null) {
             rootView.removeOnAttachStateChangeListener(componentListener);
@@ -106,19 +105,19 @@ public class ControlBar {
         Player player = getPlayer();
         if (player == null) return;
 
-        timeTool.calcTime(player);
+        mCalcTime.calcTime(player);
 
         if (tvPosition != null) {
-            tvPosition.setText(VideoUtils.formatTime(timeTool.position));
+            tvPosition.setText(VideoUtils.formatTime(mCalcTime.position));
         }
         if (tvDuration != null) {
-            tvDuration.setText(VideoUtils.formatTime(timeTool.duration));
+            tvDuration.setText(VideoUtils.formatTime(mCalcTime.duration));
         }
 
         if (seekBar != null && seekBar.getVisibility() == VISIBLE) {
-            if (timeTool.duration > 0) {
+            if (mCalcTime.duration > 0) {
                 int progress = (int)
-                        (seekBar.getMax() * timeTool.position / timeTool.duration + 0.5f);
+                        (seekBar.getMax() * mCalcTime.position / mCalcTime.duration + 0.5f);
 
                 if (!componentListener.seekBarIsDragging) {
                     if (progress > seekBar.getMax()) {
@@ -128,7 +127,7 @@ public class ControlBar {
                 }
 
                 int bufferProgress = (int)
-                        (seekBar.getMax() * timeTool.bufferedPosition / timeTool.duration + 0.5f);
+                        (seekBar.getMax() * mCalcTime.bufferedPosition / mCalcTime.duration + 0.5f);
                 if (bufferProgress > seekBar.getMax()) {
                     bufferProgress = seekBar.getMax();
                 }
@@ -143,7 +142,7 @@ public class ControlBar {
         if (playbackState != Player.STATE_IDLE && playbackState != Player.STATE_ENDED) {
             long delayMs;
             if (player.getPlayWhenReady() && playbackState == Player.STATE_READY) {
-                delayMs = VideoUtils.calcSyncPeriod(timeTool.position);
+                delayMs = VideoUtils.calcSyncPeriod(mCalcTime.position);
             } else {
                 delayMs = 1000;
             }
@@ -174,22 +173,17 @@ public class ControlBar {
         }
     }
 
-    public void hide() {
-        if (isVisible()) {
-            setVisibility(GONE);
-            rootView.removeCallbacks(hideAction);
-            hideAtMs = C.TIME_UNSET;
-        }
-    }
-
-    public void setVisibility(int visibility) {
+    @Override
+    public void setVisibility(boolean isVisible) {
         if (rootView != null) {
-            rootView.setVisibility(visibility);
-            if (visibility != VISIBLE) {
-                stopUpdateProgress();
-            } else {
+            rootView.setVisibility(isVisible ? VISIBLE : GONE);
+            if (isVisible) {
                 updateProgress();
                 hideAfterTimeout();
+            } else {
+                rootView.removeCallbacks(hideAction);
+                stopUpdateProgress();
+                hideAtMs = C.TIME_UNSET;
             }
         }
     }
@@ -202,7 +196,7 @@ public class ControlBar {
     public boolean switchVisibility() {
         if (rootView == null) return false;
 
-        setVisibility(isVisible() ? GONE : VISIBLE);
+        setVisibility(!isVisible());
 
         return isVisible();
     }
@@ -235,9 +229,9 @@ public class ControlBar {
 
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            if (timeTool != null && tvPosition != null) {
+            if (mCalcTime != null && tvPosition != null) {
                 tvPosition.setText(
-                        VideoUtils.formatTime(timeTool.duration * progress / seekBar.getMax()));
+                        VideoUtils.formatTime(mCalcTime.duration * progress / seekBar.getMax()));
             }
         }
 
@@ -250,7 +244,7 @@ public class ControlBar {
         public void onStopTrackingTouch(SeekBar seekBar) {
             seekBarIsDragging = false;
             if (controller != null) {
-                controller.seekTo(timeTool.duration * seekBar.getProgress() / seekBar.getMax());
+                controller.seekTo(mCalcTime.duration * seekBar.getProgress() / seekBar.getMax());
             }
         }
 
@@ -260,7 +254,7 @@ public class ControlBar {
             if (hideAtMs != C.TIME_UNSET) {
                 long delayMs = hideAtMs - SystemClock.uptimeMillis();
                 if (delayMs <= 0) {
-                    hide();
+                    setVisibility(false);
                 } else {
                     rootView.postDelayed(hideAction, delayMs);
                 }

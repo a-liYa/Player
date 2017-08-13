@@ -1,4 +1,4 @@
-package com.aliya.player;
+package com.aliya.player.ui;
 
 import android.content.Context;
 import android.support.annotation.AttrRes;
@@ -10,7 +10,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
 
-import com.aliya.player.ui.AspectRatioFrameLayout;
+import com.aliya.player.ui.widget.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.text.TextRenderer;

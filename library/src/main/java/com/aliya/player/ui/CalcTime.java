@@ -1,4 +1,4 @@
-package com.aliya.player;
+package com.aliya.player.ui;
 
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
@@ -8,13 +8,13 @@ import com.google.android.exoplayer2.util.Assertions;
 import java.util.Arrays;
 
 /**
- * TimeTool : 计算时间
+ * CalcTime : 计算时间
  * {@Seek com.google.android.exoplayer2.ui.PlaybackControlView#updateProgress()}
  *
  * @author a_liYa
  * @date 2017/8/11 15:32.
  */
-final class TimeTool {
+final class CalcTime {
 
     long position = 0;
     long bufferedPosition = 0;
@@ -27,7 +27,7 @@ final class TimeTool {
     private final Timeline.Period period;
     private final Timeline.Window window;
 
-    public TimeTool() {
+    public CalcTime() {
 
         period = new Timeline.Period();
         window = new Timeline.Window();

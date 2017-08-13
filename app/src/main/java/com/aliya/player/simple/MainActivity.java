@@ -7,7 +7,7 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 
-import com.aliya.player.PlayerView;
+import com.aliya.player.ui.PlayerView;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;

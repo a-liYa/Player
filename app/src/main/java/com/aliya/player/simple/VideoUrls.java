@@ -25,7 +25,6 @@ public class VideoUrls {
         return "https://v-cdn.zjol.com.cn/149064.mp4";
     }
 
-
     public static String[] getUrls() {
         return URLS;
     }

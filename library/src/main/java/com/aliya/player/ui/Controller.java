@@ -15,8 +15,8 @@ import com.google.android.exoplayer2.Timeline;
 import com.google.android.exoplayer2.source.TrackGroupArray;
 import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
 
-import static com.aliya.player.utils.VideoUtils.findViewById;
-import static com.aliya.player.utils.VideoUtils.setVisibilityControls;
+import static com.aliya.player.utils.Utils.findViewById;
+import static com.aliya.player.utils.Utils.setVisibilityControls;
 
 /**
  * Controller

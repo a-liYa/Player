@@ -8,13 +8,14 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.aliya.player.R;
-import com.aliya.player.utils.VideoUtils;
+import com.aliya.player.utils.Utils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
-import static com.aliya.player.utils.VideoUtils.findViewById;
+import static com.aliya.player.utils.Utils.findViewById;
+import static com.aliya.player.utils.Utils.setText;
 
 /**
  * NavBarControl
@@ -107,11 +108,11 @@ public class NavBarControl extends AbsControl {
 
         mCalcTime.calcTime(player);
 
-        if (tvPosition != null) {
-            tvPosition.setText(VideoUtils.formatTime(mCalcTime.position));
+        if (tvPosition != null && !componentListener.seekBarIsDragging) {
+            setText(tvPosition, Utils.formatTime(mCalcTime.position));
         }
         if (tvDuration != null) {
-            tvDuration.setText(VideoUtils.formatTime(mCalcTime.duration));
+            setText(tvDuration, Utils.formatTime(mCalcTime.duration));
         }
 
         if (seekBar != null && seekBar.getVisibility() == VISIBLE) {
@@ -142,7 +143,7 @@ public class NavBarControl extends AbsControl {
         if (playbackState != Player.STATE_IDLE && playbackState != Player.STATE_ENDED) {
             long delayMs;
             if (player.getPlayWhenReady() && playbackState == Player.STATE_READY) {
-                delayMs = VideoUtils.calcSyncPeriod(mCalcTime.position);
+                delayMs = Utils.calcSyncPeriod(mCalcTime.position);
             } else {
                 delayMs = 1000;
             }
@@ -233,14 +234,15 @@ public class NavBarControl extends AbsControl {
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
             if (mCalcTime != null && tvPosition != null) {
-                tvPosition.setText(
-                        VideoUtils.formatTime(mCalcTime.duration * progress / seekBar.getMax()));
+                setText(tvPosition,
+                        Utils.formatTime(mCalcTime.duration * progress / seekBar.getMax()));
             }
         }
 
         @Override
         public void onStartTrackingTouch(SeekBar seekBar) {
             seekBarIsDragging = true;
+            rootView.removeCallbacks(hideAction);
         }
 
         @Override
@@ -249,6 +251,7 @@ public class NavBarControl extends AbsControl {
             if (controller != null) {
                 controller.seekTo(mCalcTime.duration * seekBar.getProgress() / seekBar.getMax());
             }
+            hideAfterTimeout();
         }
 
         @Override

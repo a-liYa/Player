@@ -2,7 +2,10 @@ package com.aliya.player.utils;
 
 import android.content.Context;
 import android.support.annotation.IdRes;
+import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 
 import com.aliya.player.Control;
 
@@ -15,7 +18,7 @@ import java.text.NumberFormat;
  * @author a_liYa
  * @date 2017/5/9 10:54.
  */
-public class VideoUtils {
+public class Utils {
 
     /**
      * 计算同步周期时长 预防进度1s更新延迟问题
@@ -105,6 +108,13 @@ public class VideoUtils {
         }
 
         return null;
+    }
+
+    public static void setText(TextView tv, String text) {
+        if (tv == null) return;
+        if (!TextUtils.equals(tv.getText(), text)) {
+            tv.setText(text);
+        }
     }
 
     public static void setVisibilityControls(boolean isVisible, Control... controls) {

@@ -38,7 +38,7 @@ public class ProgressCache {
         }
     }
 
-    public void put(String key, int position) {
+    public void putCacheProgress(String key, int position) {
         if (key != null && position > 0) {
             lruCaches.put(key, Integer.valueOf(position));
         }

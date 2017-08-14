@@ -4,7 +4,7 @@ import com.bumptech.glide.annotation.GlideModule;
 import com.bumptech.glide.module.AppGlideModule;
 
 /**
- * TODO (一句话描述)
+ * AppGlideModule
  *
  * @author a_liYa
  * @date 2017/8/14 10:22.

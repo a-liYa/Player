@@ -9,7 +9,6 @@ import android.widget.FrameLayout;
 
 import com.aliya.player.ui.PlayerView;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
@@ -32,10 +31,9 @@ public class PlayerManager {
     private PlayerView mPlayerView;
     private PlayerView mSmoothPlayerView;
     private LayoutParams mPlayerLayoutParams;
-    private String mPlayerUrl;
-//    private String mPlayerUrl;
     private SimpleExoPlayer mPlayer;
 
+    private String mUrl;
     private PlayerHelper mHelper;
 
     private GroupListener mGroupListener;
@@ -69,7 +67,10 @@ public class PlayerManager {
 
         mHelper.setContext(parent.getContext());
 
-        if (TextUtils.equals(mPlayerUrl, url)) { // 同一个url，eg:全屏
+        parent.removeOnAttachStateChangeListener(mGroupListener);
+        parent.addOnAttachStateChangeListener(mGroupListener);
+
+        if (TextUtils.equals(mUrl, url)) { // 同一个url，eg:全屏
             if (mSmoothPlayerView == null) {
                 mSmoothPlayerView = new PlayerView(mHelper.getContext());
                 mSmoothPlayerView.setId(R.id.player_view);
@@ -89,10 +90,11 @@ public class PlayerManager {
                 }
                 parent.addView(mSmoothPlayerView, childIndex, mPlayerLayoutParams);
             }
-
             mSmoothPlayerView.post(smoothSwitchRunnable);
+            Extra.setExtra(mSmoothPlayerView, url, null);
 
         } else { // 不同url
+
             if (mPlayerView == null) {
                 mPlayerView = new PlayerView(mHelper.getContext());
                 mPlayerView.setId(R.id.player_view);
@@ -101,13 +103,7 @@ public class PlayerManager {
                 if (mPlayerView.getParent() instanceof ViewGroup) {
                     ((ViewGroup) mPlayerView.getParent()).removeView(mPlayerView);
                 }
-
-                Player player = mPlayerView.getPlayer();
-                if (player != null) {
-
-                    player.release();
-                    mPlayerView.setPlayer(null); // 置空
-                }
+                mPlayerView.releasePlayer();
             }
             mPlayerView.removeOnAttachStateChangeListener(mGroupListener);
             mPlayerView.addOnAttachStateChangeListener(mGroupListener);
@@ -121,29 +117,30 @@ public class PlayerManager {
                 parent.addView(mPlayerView, childIndex, mPlayerLayoutParams);
             }
 
-            mPlayerUrl = url;
+            mUrl = url;
+
+            // 1. Create a default TrackSelector
+            // 数据传输相关，传输速度、传输监听等
+            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+            TrackSelection.Factory videoTrackSelectionFactory =
+                    new AdaptiveTrackSelection.Factory(bandwidthMeter);
+            DefaultTrackSelector trackSelector =
+                    new DefaultTrackSelector(videoTrackSelectionFactory);
+
+            // 2. Create the mPlayer
+            mPlayer = ExoPlayerFactory.newSimpleInstance(mHelper.getContext(), trackSelector);
+
+            mPlayerView.setPlayer(mPlayer);
+            Extra.setExtra(mPlayerView, url, null);
+
+            MediaSource videoSource = mHelper.buildMediaSource(Uri.parse(url), null, bandwidthMeter);
+
+            // 3. 准备播放.
+            mPlayer.prepare(videoSource);
+
+            // 4. 开始播放.
+            mPlayer.setPlayWhenReady(true);
         }
-
-        // 1. Create a default TrackSelector
-        // 数据传输相关，传输速度、传输监听等
-        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-        TrackSelection.Factory videoTrackSelectionFactory =
-                new AdaptiveTrackSelection.Factory(bandwidthMeter);
-        DefaultTrackSelector trackSelector =
-                new DefaultTrackSelector(videoTrackSelectionFactory);
-
-        // 2. Create the mPlayer
-        mPlayer = ExoPlayerFactory.newSimpleInstance(mHelper.getContext(), trackSelector);
-
-        mPlayerView.setPlayer(mPlayer);
-
-        MediaSource videoSource = mHelper.buildMediaSource(Uri.parse(url), null, bandwidthMeter);
-
-        // 3. 准备播放.
-        mPlayer.prepare(videoSource);
-
-        // 4. 开始播放.
-        mPlayer.setPlayWhenReady(true);
 
     }
 
@@ -178,7 +175,9 @@ public class PlayerManager {
 
         // 从上一个依附控件中删除
         if (mSmoothPlayerView.getParent() instanceof ViewGroup) {
-            ((ViewGroup) mSmoothPlayerView.getParent()).removeView(mSmoothPlayerView);
+            ViewGroup parent = (ViewGroup) mSmoothPlayerView.getParent();
+            parent.removeOnAttachStateChangeListener(mGroupListener);
+            parent.removeView(mSmoothPlayerView);
         }
 
     }
@@ -201,15 +200,17 @@ public class PlayerManager {
 
         @Override
         public void onViewDetachedFromWindow(View v) {
-//            if (mPlayerView != null && mPlayerView.getParent() == v) {
-//                // 视频父容器被删除
-//                stop();
-//                ((ViewGroup) v).removeView(mPlayerView);
-//            } else if (mSmoothPlayerView != null && mSmoothPlayerView.getParent() == v) {
-//                // 视频父容器被删除
-//                stop();
-//                ((ViewGroup) v).removeView(mSmoothPlayerView);
-//            } else if (v.getId() == R.id.player_view) {
+            if (mPlayerView != null && mPlayerView.getParent() == v) {
+                // 视频父容器被删除
+                mUrl = null;
+                mPlayerView.releasePlayer();
+                ((ViewGroup) v).removeView(mPlayerView);
+            } else if (mSmoothPlayerView != null && mSmoothPlayerView.getParent() == v) {
+                // 视频父容器被删除
+                mUrl = null;
+                mSmoothPlayerView.releasePlayer();
+                ((ViewGroup) v).removeView(mSmoothPlayerView);
+            }  // else if (v.getId() == R.id.player_view) {
 //                final ViewParent parent = v.getParent();
 //                v.post(new Runnable() {
 //                    @Override

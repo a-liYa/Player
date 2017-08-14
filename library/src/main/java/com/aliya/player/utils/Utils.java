@@ -1,6 +1,8 @@
 package com.aliya.player.utils;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.IdRes;
 import android.text.TextUtils;
 import android.view.View;
@@ -96,6 +98,17 @@ public class Utils {
             return true;
         }
         return false;
+    }
+
+    /**
+     * 网络是否可用
+     *
+     * @return true:可用
+     */
+    public static boolean isAvailable(Context context) {
+        NetworkInfo networkInfo = ((ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        return networkInfo != null && networkInfo.isConnected();
     }
 
     public final static <T extends View> T findViewById(View parent, @IdRes int id) {

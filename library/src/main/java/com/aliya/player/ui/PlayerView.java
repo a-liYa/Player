@@ -10,6 +10,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.aliya.player.R;
 import com.aliya.player.ui.widget.AspectRatioFrameLayout;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
@@ -50,6 +51,7 @@ public class PlayerView extends FrameLayout {
     }
 
     private void init(Context context) {
+        setBackgroundResource(R.color.module_player_background);
 
         controller = new Controller(this);
 
@@ -111,10 +113,14 @@ public class PlayerView extends FrameLayout {
 
     public void releasePlayer() {
         if (player != null) {
+            controller.cacheProgress();
             if (controller != null) {
                 controller.setPlayer(null);
             }
             player.release();
+            player.clearTextOutput(componentListener);
+            player.clearVideoListener(componentListener);
+            player = null;
         }
     }
 

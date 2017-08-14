@@ -1,5 +1,6 @@
 package com.aliya.player.utils;
 
+import android.util.Log;
 import android.util.LruCache;
 
 /**
@@ -13,7 +14,7 @@ public class ProgressCache {
     private static final int DEFAULT_PROGRESS_CACHE_MAX_SIZE = 2; // 默认缓存 max size
     public static final int NO_VALUE = 0;
 
-    public LruCache<String, Integer> lruCaches; // 最近最少（Least Recently Used）
+    private LruCache<String, Long> lruCaches; // 最近最少（Least Recently Used）
 
     private static volatile ProgressCache sInstance;
 
@@ -38,14 +39,22 @@ public class ProgressCache {
         }
     }
 
-    public void putCacheProgress(String key, int position) {
+    public void putCacheProgress(String key, long position) {
+        Log.e("TAG", "putCacheProgress " + Utils.formatTime(position) + " - " + position);
         if (key != null && position > 0) {
-            lruCaches.put(key, Integer.valueOf(position));
+            lruCaches.put(key, Long.valueOf(position));
+        }
+    }
+
+    public void removeCacheProgress(String key) {
+        Log.e("TAG", "removeCacheProgress ");
+        if (key != null) {
+            lruCaches.remove(key);
         }
     }
 
     public int getCacheProgress(String key) {
-        Integer value = lruCaches.get(key);
+        Long value = lruCaches.get(key);
         if (value != null) {
             return value.intValue();
         }

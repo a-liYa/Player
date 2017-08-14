@@ -2,9 +2,10 @@ package com.aliya.player.ui;
 
 import android.view.View;
 import android.view.ViewStub;
+import android.widget.Toast;
 
 import com.aliya.player.R;
-import com.google.android.exoplayer2.Player;
+import com.aliya.player.utils.Utils;
 
 /**
  * ErrorControl
@@ -60,8 +61,13 @@ public class ErrorControl extends AbsControl {
                     @Override
                     public void onClick(View view) {
                         if (controller != null) {
-                            hide();
-                            // TODO 待完善
+                            if (Utils.isAvailable(view.getContext())) {
+                                setVisibility(false);
+                                // TODO 待完善
+                            } else {
+                                Toast.makeText(view.getContext(), "网络不可用", Toast.LENGTH_SHORT)
+                                        .show();
+                            }
                         }
                     }
                 });

@@ -18,14 +18,22 @@ abstract class AbsControl implements Control {
         this.controller = controller;
     }
 
-    protected Player getPlayer() {
+    @Override
+    public Player getPlayer() {
         return controller != null ? controller.getPlayer() : null;
     }
 
+    @Override
+    public PlayerView getPlayerView() {
+        return controller != null ? controller.getPlayerView() : null;
+    }
+
+    @Override
     public VisibilityListener getVisibilityListener() {
         return visibilityListener;
     }
 
+    @Override
     public void setVisibilityListener(VisibilityListener visibilityListener) {
         this.visibilityListener = visibilityListener;
     }

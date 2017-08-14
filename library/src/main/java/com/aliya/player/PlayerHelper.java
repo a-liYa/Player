@@ -29,7 +29,7 @@ import com.google.android.exoplayer2.util.Util;
  * @author a_liYa
  * @date 2017/8/13 21:51.
  */
-class PlayerHelper {
+public class PlayerHelper {
 
     private Context context;
     private Handler mainHandler;

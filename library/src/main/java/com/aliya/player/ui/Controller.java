@@ -187,12 +187,8 @@ public class Controller {
             updateControlVisibilityCanSwitch();
 
             if (playerView != null) {
-                PlayerOpt opt = playerView.getPlayerOpt();
-                if (opt != null) {
-                    opt.releasePlayer();
-                }
+                playerView.releasePlayer();
             }
-
         }
 
         @Override
@@ -218,14 +214,6 @@ public class Controller {
                 }
             }
         }
-    }
-
-    public interface PlayerOpt{
-
-        void replay();
-
-        void releasePlayer();
-
     }
 
 }

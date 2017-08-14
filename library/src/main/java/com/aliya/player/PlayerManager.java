@@ -1,22 +1,12 @@
 package com.aliya.player;
 
-import android.net.Uri;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
-import com.aliya.player.ui.Controller;
 import com.aliya.player.ui.PlayerView;
-import com.aliya.player.utils.ProgressCache;
-import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.SimpleExoPlayer;
-import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
-import com.google.android.exoplayer2.trackselection.TrackSelection;
-import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
 import java.lang.ref.SoftReference;
 
@@ -33,10 +23,9 @@ public class PlayerManager {
     private PlayerView mPlayerView;
     private PlayerView mSmoothPlayerView;
     private LayoutParams mPlayerLayoutParams;
-    private SimpleExoPlayer mPlayer;
 
     private FrameLayout mBackupParent;
-    private String mUrl, mBackupUrl;
+    private String mBackupUrl;
     private PlayerHelper mHelper;
 
     private GroupListener mGroupListener;
@@ -73,10 +62,11 @@ public class PlayerManager {
         parent.removeOnAttachStateChangeListener(mGroupListener);
         parent.addOnAttachStateChangeListener(mGroupListener);
 
-        if (TextUtils.equals(mUrl, url)) { // 同一个url，eg:全屏
+        if (TextUtils.equals(mBackupUrl, url) && mPlayerView != null && !mPlayerView.isRelease()) {
+            // 同一个url, 且没释放; eg:全屏
             if (mSmoothPlayerView == null) {
                 mSmoothPlayerView = new PlayerView(mHelper.getContext());
-                mSmoothPlayerView.setPlayerOpt(mGroupListener);
+                mSmoothPlayerView.setPlayerHelper(mHelper);
                 mSmoothPlayerView.setId(R.id.player_view);
             }
 
@@ -101,14 +91,14 @@ public class PlayerManager {
 
             if (mPlayerView == null) {
                 mPlayerView = new PlayerView(mHelper.getContext());
-                mPlayerView.setPlayerOpt(mGroupListener);
+                mPlayerView.setPlayerHelper(mHelper);
                 mPlayerView.setId(R.id.player_view);
             }
 
             mPlayerView.releasePlayer();
 
-            if (mPlayerView.getParent() != parent) { // 从上一个依附控件中删除
-                if (mPlayerView.getParent() instanceof ViewGroup) {
+            if (mPlayerView.getParent() != parent) {
+                if (mPlayerView.getParent() instanceof ViewGroup) { // 从上一个依附控件中删除
                     ((ViewGroup) mPlayerView.getParent()).removeView(mPlayerView);
                 }
                 if (childIndex < 0) {
@@ -124,43 +114,12 @@ public class PlayerManager {
             mPlayerView.removeOnAttachStateChangeListener(mGroupListener);
             mPlayerView.addOnAttachStateChangeListener(mGroupListener);
 
-            mBackupUrl = mUrl = url;
+            mBackupUrl = url;
+            mPlayerView.play(url);
 
-            // 1. Create a default TrackSelector
-            // 数据传输相关，传输速度、传输监听等
-            DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
-            TrackSelection.Factory videoTrackSelectionFactory =
-                    new AdaptiveTrackSelection.Factory(bandwidthMeter);
-            DefaultTrackSelector trackSelector =
-                    new DefaultTrackSelector(videoTrackSelectionFactory);
-
-            // 2. Create the mPlayer
-            mPlayer = ExoPlayerFactory.newSimpleInstance(mHelper.getContext(), trackSelector);
-
-            mPlayerView.setPlayer(mPlayer);
             Extra.setExtra(mPlayerView, url, null);
-
-            MediaSource videoSource = mHelper.buildMediaSource(Uri.parse(url), null, bandwidthMeter);
-
-            // 3. 准备播放.
-            mPlayer.prepare(videoSource);
-
-            // 4. 开始播放.
-            mPlayer.setPlayWhenReady(true);
-
-            int progress = ProgressCache.get().getCacheProgress(url);
-            if (progress != ProgressCache.NO_VALUE && progress > 0) {
-                mPlayer.seekTo(progress);
-            }
         }
 
-    }
-
-    public void release() {
-        mUrl = null;
-        if (mPlayerView != null) {
-            mPlayerView.releasePlayer();
-        }
     }
 
     private Runnable smoothSwitchRunnable = new Runnable() {
@@ -175,12 +134,12 @@ public class PlayerManager {
      */
     private void smoothSwitchView() {
 
-        if (mPlayerView == mSmoothPlayerView || mPlayer == null) {
+        if (mPlayerView == mSmoothPlayerView || mPlayerView.getPlayer() == null) {
             return;
         }
 
         if (mSmoothPlayerView != null) {
-            mSmoothPlayerView.setPlayer(mPlayer);
+            mSmoothPlayerView.setPlayer(mPlayerView.getPlayer());
         }
 
         if (mPlayerView != null) {
@@ -201,7 +160,7 @@ public class PlayerManager {
 
     }
 
-    class GroupListener implements View.OnAttachStateChangeListener, Controller.PlayerOpt{
+    class GroupListener implements View.OnAttachStateChangeListener{
 
         @Override
         public void onViewAttachedToWindow(View v) {
@@ -221,12 +180,10 @@ public class PlayerManager {
         public void onViewDetachedFromWindow(View v) {
             if (mPlayerView != null && mPlayerView.getParent() == v) {
                 // 视频父容器被删除
-                mUrl = null;
                 mPlayerView.releasePlayer();
                 ((ViewGroup) v).removeView(mPlayerView);
             } else if (mSmoothPlayerView != null && mSmoothPlayerView.getParent() == v) {
                 // 视频父容器被删除
-                mUrl = null;
                 mSmoothPlayerView.releasePlayer();
                 ((ViewGroup) v).removeView(mSmoothPlayerView);
             }  // else if (v.getId() == R.id.player_view) {
@@ -246,15 +203,6 @@ public class PlayerManager {
 //            }
         }
 
-        @Override
-        public void replay() {
-            play(mBackupParent, mBackupUrl);
-        }
-
-        @Override
-        public void releasePlayer() {
-            release();
-        }
     }
 
 }

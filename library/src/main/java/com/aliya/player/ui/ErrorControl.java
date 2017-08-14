@@ -80,10 +80,7 @@ public class ErrorControl extends AbsControl {
                     setVisibility(false);
                     PlayerView playerView = controller.getPlayerView();
                     if (playerView != null) {
-                        Controller.PlayerOpt opt = playerView.getPlayerOpt();
-                        if (opt != null) {
-                            opt.replay();
-                        }
+                        playerView.replay();
                     }
                 } else {
                     Toast.makeText(view.getContext(), "网络不可用", Toast.LENGTH_SHORT).show();

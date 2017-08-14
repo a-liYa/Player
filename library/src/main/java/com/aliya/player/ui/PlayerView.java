@@ -1,21 +1,30 @@
 package com.aliya.player.ui;
 
 import android.content.Context;
+import android.net.Uri;
 import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.aliya.player.PlayerHelper;
 import com.aliya.player.R;
 import com.aliya.player.ui.widget.AspectRatioFrameLayout;
-import com.google.android.exoplayer2.Player;
+import com.aliya.player.utils.ProgressCache;
+import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.text.TextRenderer;
+import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelection;
+import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
 import java.util.List;
 
@@ -29,10 +38,12 @@ public class PlayerView extends FrameLayout {
 
     private View surfaceView;
     private AspectRatioFrameLayout contentFrame;
-    private SimpleExoPlayer player;
-    private Controller.PlayerOpt mPlayerOpt;
-    private Controller controller;
 
+    private String mUrl;
+
+    private SimpleExoPlayer player;
+    private Controller controller;
+    private PlayerHelper mHelper;
     private ComponentListener componentListener;
 
     public PlayerView(@NonNull Context context) {
@@ -74,11 +85,46 @@ public class PlayerView extends FrameLayout {
 
             controller.onViewCreate();
         }
+    }
 
+    public void setPlayerHelper(PlayerHelper helper) {
+        mHelper = helper;
+    }
+
+    public void replay() {
+        if (!TextUtils.isEmpty(mUrl)) play(mUrl);
+    }
+
+    public void play(String url) {
+        mUrl = url;
+        // 1. Create a default TrackSelector
+        // 数据传输相关，传输速度、传输监听等
+        DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
+        TrackSelection.Factory videoTrackSelectionFactory =
+                new AdaptiveTrackSelection.Factory(bandwidthMeter);
+        DefaultTrackSelector trackSelector =
+                new DefaultTrackSelector(videoTrackSelectionFactory);
+
+        // 2. Create the mPlayer
+        SimpleExoPlayer player = ExoPlayerFactory.newSimpleInstance(getContext(), trackSelector);
+
+        setPlayer(player);
+
+        MediaSource videoSource = mHelper.buildMediaSource(Uri.parse(url), null, bandwidthMeter);
+
+        // 3. 准备播放.
+        player.prepare(videoSource);
+
+        // 4. 开始播放.
+        player.setPlayWhenReady(true);
+
+        int progress = ProgressCache.get().getCacheProgress(url);
+        if (progress != ProgressCache.NO_VALUE && progress > 0) {
+            player.seekTo(progress);
+        }
     }
 
     public void setPlayer(SimpleExoPlayer player) {
-
         if (this.player == player) {
             return;
         }
@@ -107,7 +153,7 @@ public class PlayerView extends FrameLayout {
         }
     }
 
-    public Player getPlayer(){
+    public SimpleExoPlayer getPlayer() {
         return player;
     }
 
@@ -124,19 +170,14 @@ public class PlayerView extends FrameLayout {
         }
     }
 
-    public Controller.PlayerOpt getPlayerOpt() {
-        return mPlayerOpt;
-    }
-
-    public void setPlayerOpt(Controller.PlayerOpt playerOpt) {
-        mPlayerOpt = playerOpt;
+    public boolean isRelease() {
+        return player == null;
     }
 
     private final class ComponentListener implements SimpleExoPlayer.VideoListener,
             TextRenderer.Output {
 
         // TextRenderer.Output implementation
-
         @Override
         public void onCues(List<Cue> cues) {
 //            if (subtitleView != null) {
@@ -160,7 +201,6 @@ public class PlayerView extends FrameLayout {
 //                shutterView.setVisibility(INVISIBLE);
 //            }
         }
-
 
     }
 

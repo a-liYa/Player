@@ -3,7 +3,6 @@ package com.aliya.player.utils;
 import android.content.Context;
 import android.support.annotation.IdRes;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 

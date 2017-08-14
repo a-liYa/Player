@@ -11,6 +11,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.aliya.player.ui.widget.AspectRatioFrameLayout;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.text.Cue;
 import com.google.android.exoplayer2.text.TextRenderer;
@@ -103,6 +104,10 @@ public class PlayerView extends FrameLayout {
             player.setVideoListener(componentListener);
             player.setTextOutput(componentListener);
         }
+    }
+
+    public Player getPlayer(){
+        return player;
     }
 
     public void releasePlayer() {

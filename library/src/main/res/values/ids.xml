@@ -12,6 +12,9 @@
     <item name="player_click_retry" type="id" />
     <item name="player_stub_play_error" type="id" />
 
+    <item name="player_view" type="id" />
+
+
     <item name="exo_shutter" type="id" />
     <item name="exo_subtitles" type="id" />
     <item name="exo_artwork" type="id" />

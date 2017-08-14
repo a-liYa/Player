@@ -46,11 +46,10 @@ public class PlayerView extends FrameLayout {
             defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        init(context, attrs);
-
+        init(context);
     }
 
-    private void init(Context context, AttributeSet attrs) {
+    private void init(Context context) {
 
         controller = new Controller(this);
 

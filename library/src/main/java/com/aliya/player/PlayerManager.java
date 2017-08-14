@@ -49,7 +49,7 @@ public class PlayerManager {
     }
 
     public static PlayerManager get() {
-        PlayerManager manager = null;
+        PlayerManager manager;
         if (sSoftInstance == null || (manager = sSoftInstance.get()) == null) {
             synchronized (PlayerManager.class) {
                 if (sSoftInstance == null || (manager = sSoftInstance.get()) == null) {

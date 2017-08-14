@@ -62,15 +62,6 @@ public class Controller {
         updateControlVisibilityCanSwitch();
     }
 
-//    private void setBufferProgressVisibility(boolean isVisible) {
-//        if (bufferControl != null) {
-//            bufferControl.setVisibility(isVisible);
-//        }
-//        if (isVisible) { // 缓冲加载时，隐藏 nav bar
-//            if (navBarControl != null) navBarControl.setVisibility(false);
-//        }
-//    }
-
     private void updateControlVisibilityCanSwitch() {
         View.OnClickListener listener = componentListener;
         if (bufferControl != null && bufferControl.isVisible()) {

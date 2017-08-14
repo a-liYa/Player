@@ -7,7 +7,9 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
+import com.aliya.player.ui.Controller;
 import com.aliya.player.ui.PlayerView;
+import com.aliya.player.utils.ProgressCache;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -33,7 +35,8 @@ public class PlayerManager {
     private LayoutParams mPlayerLayoutParams;
     private SimpleExoPlayer mPlayer;
 
-    private String mUrl;
+    private FrameLayout mBackupParent;
+    private String mUrl, mBackupUrl;
     private PlayerHelper mHelper;
 
     private GroupListener mGroupListener;
@@ -64,7 +67,7 @@ public class PlayerManager {
 
     public void play(FrameLayout parent, String url, int childIndex) {
         if (TextUtils.isEmpty(url) || parent == null) return;
-
+        mBackupParent = parent;
         mHelper.setContext(parent.getContext());
 
         parent.removeOnAttachStateChangeListener(mGroupListener);
@@ -73,6 +76,7 @@ public class PlayerManager {
         if (TextUtils.equals(mUrl, url)) { // 同一个url，eg:全屏
             if (mSmoothPlayerView == null) {
                 mSmoothPlayerView = new PlayerView(mHelper.getContext());
+                mSmoothPlayerView.setPlayerOpt(mGroupListener);
                 mSmoothPlayerView.setId(R.id.player_view);
             }
 
@@ -97,27 +101,30 @@ public class PlayerManager {
 
             if (mPlayerView == null) {
                 mPlayerView = new PlayerView(mHelper.getContext());
+                mPlayerView.setPlayerOpt(mGroupListener);
                 mPlayerView.setId(R.id.player_view);
-            } else {
-                // 从上一个依附控件中删除
+            }
+
+            mPlayerView.releasePlayer();
+
+            if (mPlayerView.getParent() != parent) { // 从上一个依附控件中删除
                 if (mPlayerView.getParent() instanceof ViewGroup) {
                     ((ViewGroup) mPlayerView.getParent()).removeView(mPlayerView);
                 }
-                mPlayerView.releasePlayer();
+                if (childIndex < 0) {
+                    parent.addView(mPlayerView, mPlayerLayoutParams);
+                } else {
+                    if (childIndex > parent.getChildCount()) {
+                        childIndex = parent.getChildCount();
+                    }
+                    parent.addView(mPlayerView, childIndex, mPlayerLayoutParams);
+                }
             }
+
             mPlayerView.removeOnAttachStateChangeListener(mGroupListener);
             mPlayerView.addOnAttachStateChangeListener(mGroupListener);
 
-            if (childIndex < 0) {
-                parent.addView(mPlayerView, mPlayerLayoutParams);
-            } else {
-                if (childIndex > parent.getChildCount()) {
-                    childIndex = parent.getChildCount();
-                }
-                parent.addView(mPlayerView, childIndex, mPlayerLayoutParams);
-            }
-
-            mUrl = url;
+            mBackupUrl = mUrl = url;
 
             // 1. Create a default TrackSelector
             // 数据传输相关，传输速度、传输监听等
@@ -140,8 +147,20 @@ public class PlayerManager {
 
             // 4. 开始播放.
             mPlayer.setPlayWhenReady(true);
+
+            int progress = ProgressCache.get().getCacheProgress(url);
+            if (progress != ProgressCache.NO_VALUE && progress > 0) {
+                mPlayer.seekTo(progress);
+            }
         }
 
+    }
+
+    public void release() {
+        mUrl = null;
+        if (mPlayerView != null) {
+            mPlayerView.releasePlayer();
+        }
     }
 
     private Runnable smoothSwitchRunnable = new Runnable() {
@@ -182,7 +201,7 @@ public class PlayerManager {
 
     }
 
-    class GroupListener implements View.OnAttachStateChangeListener {
+    class GroupListener implements View.OnAttachStateChangeListener, Controller.PlayerOpt{
 
         @Override
         public void onViewAttachedToWindow(View v) {
@@ -226,10 +245,16 @@ public class PlayerManager {
 //                }
 //            }
         }
+
+        @Override
+        public void replay() {
+            play(mBackupParent, mBackupUrl);
+        }
+
+        @Override
+        public void releasePlayer() {
+            release();
+        }
     }
-
-
-
-
 
 }

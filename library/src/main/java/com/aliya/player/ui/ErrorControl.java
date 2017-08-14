@@ -57,25 +57,12 @@ public class ErrorControl extends AbsControl {
                 viewStub = null;
 
                 View view = rootView.findViewById(R.id.player_click_retry);
-                view.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (controller != null) {
-                            if (Utils.isAvailable(view.getContext())) {
-                                setVisibility(false);
-                                // TODO 待完善
-                            } else {
-                                Toast.makeText(view.getContext(), "网络不可用", Toast.LENGTH_SHORT)
-                                        .show();
-                            }
-                        }
-                    }
-                });
+                view.setOnClickListener(mOnClickListener);
             }
-        }
 
-        if (rootView != null) {
-            rootView.setVisibility(View.VISIBLE);
+            if (rootView != null) {
+                rootView.setVisibility(View.VISIBLE);
+            }
         }
     }
 
@@ -84,5 +71,25 @@ public class ErrorControl extends AbsControl {
             rootView.setVisibility(View.GONE);
         }
     }
+
+    private View.OnClickListener mOnClickListener = new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+            if (view.getId() == R.id.player_click_retry) {
+                if (Utils.isAvailable(view.getContext()) && controller != null) {
+                    setVisibility(false);
+                    PlayerView playerView = controller.getPlayerView();
+                    if (playerView != null) {
+                        Controller.PlayerOpt opt = playerView.getPlayerOpt();
+                        if (opt != null) {
+                            opt.replay();
+                        }
+                    }
+                } else {
+                    Toast.makeText(view.getContext(), "网络不可用", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+    };
 
 }

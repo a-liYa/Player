@@ -30,7 +30,7 @@ public class PlayerView extends FrameLayout {
     private View surfaceView;
     private AspectRatioFrameLayout contentFrame;
     private SimpleExoPlayer player;
-
+    private Controller.PlayerOpt mPlayerOpt;
     private Controller controller;
 
     private ComponentListener componentListener;
@@ -122,6 +122,14 @@ public class PlayerView extends FrameLayout {
             player.clearVideoListener(componentListener);
             player = null;
         }
+    }
+
+    public Controller.PlayerOpt getPlayerOpt() {
+        return mPlayerOpt;
+    }
+
+    public void setPlayerOpt(Controller.PlayerOpt playerOpt) {
+        mPlayerOpt = playerOpt;
     }
 
     private final class ComponentListener implements SimpleExoPlayer.VideoListener,

@@ -105,6 +105,20 @@ public class Controller {
         }
     }
 
+    public void cacheProgress() {
+        if (player == null
+                || player.getCurrentPosition() == C.TIME_UNSET
+                || player.getDuration() == C.TIME_UNSET ) return;
+
+        if (Math.abs(player.getDuration() - player.getCurrentPosition()) < 1000) {
+            ProgressCache.get().removeCacheProgress(Extra.getExtraUrl(playerView));
+        } else {
+            ProgressCache.get()
+                    .putCacheProgress(Extra.getExtraUrl(playerView), player.getCurrentPosition());
+        }
+
+    }
+
     private final class ComponentListener implements Player.EventListener, View.OnClickListener,
             Control.VisibilityListener {
 
@@ -171,6 +185,14 @@ public class Controller {
                 errorControl.setVisibility(true);
             }
             updateControlVisibilityCanSwitch();
+
+            if (playerView != null) {
+                PlayerOpt opt = playerView.getPlayerOpt();
+                if (opt != null) {
+                    opt.releasePlayer();
+                }
+            }
+
         }
 
         @Override
@@ -198,17 +220,11 @@ public class Controller {
         }
     }
 
-    public void cacheProgress() {
-        if (player == null
-                || player.getCurrentPosition() == C.TIME_UNSET
-                || player.getDuration() == C.TIME_UNSET ) return;
+    public interface PlayerOpt{
 
-        if (Math.abs(player.getDuration() - player.getCurrentPosition()) < 1000) {
-            ProgressCache.get().removeCacheProgress(Extra.getExtraUrl(playerView));
-        } else {
-            ProgressCache.get()
-                    .putCacheProgress(Extra.getExtraUrl(playerView), player.getCurrentPosition());
-        }
+        void replay();
+
+        void releasePlayer();
 
     }
 

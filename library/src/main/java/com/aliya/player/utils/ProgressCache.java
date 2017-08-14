@@ -1,6 +1,5 @@
 package com.aliya.player.utils;
 
-import android.util.Log;
 import android.util.LruCache;
 
 /**
@@ -40,14 +39,12 @@ public class ProgressCache {
     }
 
     public void putCacheProgress(String key, long position) {
-        Log.e("TAG", "putCacheProgress " + Utils.formatTime(position) + " - " + position);
         if (key != null && position > 0) {
             lruCaches.put(key, Long.valueOf(position));
         }
     }
 
     public void removeCacheProgress(String key) {
-        Log.e("TAG", "removeCacheProgress ");
         if (key != null) {
             lruCaches.remove(key);
         }

@@ -34,6 +34,9 @@ public interface Control {
 
         /**
          * Called when the visibility changes.
+         *
+         * @param control   .
+         * @param isVisible .
          */
         void onVisibilityChange(Control control, boolean isVisible);
 

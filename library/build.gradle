@@ -35,10 +35,10 @@ dependencies {
 }
 
 ext {
-    publishArtifact = 'player'
+    publishArtifact = 'android-player'
     publishVersion = vName // 发布到Jcenter的版本号
-    publishDesc = 'BannerView 实现自动无限轮播的 ViewPager'
-    publishWebsite = 'https://github.com/a-liYa/BannerView'
+    publishDesc = '一个基于ExoPlayer封装过的Android player'
+    publishWebsite = 'https://github.com/a-liYa/Player'
 }
 
 apply from: "${rootDir}/publish.gradle"

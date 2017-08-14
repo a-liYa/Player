@@ -36,6 +36,7 @@ public class Utils {
      * 下载速度格式化显示
      *
      * @param speed 网速 单位：Byte/s
+     * @return 格式化
      */
     public static String formatSpeed(int speed) {
         long fileSize = (long) speed;
@@ -52,12 +53,15 @@ public class Utils {
 
     /**
      * 时长格式化显示
+     *
+     * @param timeMs 时长 单位：ms
+     * @return 格式化
      */
-    public static String formatTime(long time) {
-        if (time < 0) {
+    public static String formatTime(long timeMs) {
+        if (timeMs < 0) {
             return "--:--";
         }
-        int totalSeconds = (int) ((time + 500) / 1000);
+        int totalSeconds = (int) ((timeMs + 500) / 1000);
         int seconds = totalSeconds % 60;
         int minutes = (totalSeconds / 60) % 60;
         int hours = totalSeconds / 3600;
@@ -69,6 +73,7 @@ public class Utils {
      * 视频大小格式化显示
      *
      * @param size 大小 单位：Byte
+     * @return 格式化
      */
     public static String formatSize(int size) {
         NumberFormat numberFormat = NumberFormat.getNumberInstance();
@@ -79,6 +84,10 @@ public class Utils {
 
     /**
      * dp转换px
+     *
+     * @param context 上下文
+     * @param dip     dp
+     * @return px
      */
     public static int dp2px(Context context, float dip) {
         final float scale = context.getResources().getDisplayMetrics().density;
@@ -87,6 +96,9 @@ public class Utils {
 
     /**
      * 当前播放的是否是直播
+     *
+     * @param url .
+     * @return true 表示直播类型
      */
     public static boolean isLive(String url) {
         if (url != null
@@ -103,7 +115,8 @@ public class Utils {
     /**
      * 网络是否可用
      *
-     * @return true:可用
+     * @param context .
+     * @return true 表示可用
      */
     public static boolean isAvailable(Context context) {
         NetworkInfo networkInfo = ((ConnectivityManager)

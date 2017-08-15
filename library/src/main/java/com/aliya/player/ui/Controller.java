@@ -8,7 +8,6 @@ import com.aliya.player.Control;
 import com.aliya.player.Extra;
 import com.aliya.player.R;
 import com.aliya.player.utils.ProgressCache;
-import com.aliya.player.utils.Utils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -108,7 +107,7 @@ public class Controller {
     public void cacheProgress() {
         if (player == null
                 || player.getCurrentPosition() == C.TIME_UNSET
-                || player.getDuration() == C.TIME_UNSET ) return;
+                || player.getDuration() == C.TIME_UNSET) return;
 
         if (Math.abs(player.getDuration() - player.getCurrentPosition()) < 1000) {
             ProgressCache.get().removeCacheProgress(Extra.getExtraUrl(playerView));
@@ -117,6 +116,27 @@ public class Controller {
                     .putCacheProgress(Extra.getExtraUrl(playerView), player.getCurrentPosition());
         }
 
+    }
+
+    /**
+     * 同步状态
+     *
+     * @param synced 被同步的对象
+     */
+    public void syncRegime(Controller synced) {
+        if (synced == null || this == synced) return;
+
+        if (bufferControl != null && synced.bufferControl != null) {
+            bufferControl.setVisibility(synced.bufferControl.isVisible());
+        }
+
+        if (navBarControl != null && synced.navBarControl != null) {
+            navBarControl.setVisibility(synced.navBarControl.isVisible());
+        }
+
+        if (errorControl != null && synced.errorControl != null) {
+            errorControl.setVisibility(synced.errorControl.isVisible());
+        }
     }
 
     private final class ComponentListener implements Player.EventListener, View.OnClickListener,

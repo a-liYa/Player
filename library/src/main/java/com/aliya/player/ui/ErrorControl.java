@@ -59,10 +59,9 @@ public class ErrorControl extends AbsControl {
                 View view = rootView.findViewById(R.id.player_click_retry);
                 view.setOnClickListener(mOnClickListener);
             }
-
-            if (rootView != null) {
-                rootView.setVisibility(View.VISIBLE);
-            }
+        }
+        if (rootView != null) {
+            rootView.setVisibility(View.VISIBLE);
         }
     }
 

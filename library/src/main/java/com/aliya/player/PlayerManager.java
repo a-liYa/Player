@@ -140,6 +140,7 @@ public class PlayerManager {
 
         if (mSmoothPlayerView != null) {
             mSmoothPlayerView.setPlayer(mPlayerView.getPlayer());
+            mSmoothPlayerView.syncRegime(mPlayerView);
         }
 
         if (mPlayerView != null) {

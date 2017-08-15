@@ -174,6 +174,17 @@ public class PlayerView extends FrameLayout {
         return player == null;
     }
 
+    /**
+     * 同步状态
+     *
+     * @param synced 被同步的对象
+     */
+    public void syncRegime(PlayerView synced) {
+        if (controller != null && synced != null) {
+            controller.syncRegime(synced.controller);
+        }
+    }
+
     private final class ComponentListener implements SimpleExoPlayer.VideoListener,
             TextRenderer.Output {
 

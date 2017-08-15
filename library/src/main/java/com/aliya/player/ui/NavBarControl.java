@@ -7,6 +7,7 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.aliya.player.FullscreenActivity;
 import com.aliya.player.R;
 import com.aliya.player.utils.Utils;
 import com.google.android.exoplayer2.C;
@@ -159,6 +160,14 @@ public class NavBarControl extends AbsControl {
         }
     }
 
+    public void updateIcFullscreen(boolean fullscreen) {
+        if (ivFullscreen != null) {
+            Log.e("TAG", "updateIcFullscreen " + fullscreen);
+            ivFullscreen.setImageResource(fullscreen
+                    ? R.mipmap.module_player_controls_retract: R.mipmap.module_player_controls_spread);
+        }
+    }
+
     public void hideAfterTimeout() {
         rootView.removeCallbacks(hideAction);
 
@@ -225,7 +234,10 @@ public class NavBarControl extends AbsControl {
                 if (v.getId() == R.id.player_play_pause) {
                     player.setPlayWhenReady(!player.getPlayWhenReady());
                 } else if (v.getId() == R.id.player_full_screen) {
-                    Log.e("TAG", "player_full_screen");
+                    PlayerView playerView = getPlayerView();
+                    if (playerView != null) {
+                        playerView.switchFullScreen();
+                    }
                 }
             }
             hideAfterTimeout();

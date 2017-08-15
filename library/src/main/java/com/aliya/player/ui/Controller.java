@@ -139,6 +139,12 @@ public class Controller {
         }
     }
 
+    public void updateIcFullscreen(boolean fullscreen) {
+        if (navBarControl != null) {
+            navBarControl.updateIcFullscreen(fullscreen);
+        }
+    }
+
     private final class ComponentListener implements Player.EventListener, View.OnClickListener,
             Control.VisibilityListener {
 

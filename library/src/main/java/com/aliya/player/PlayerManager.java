@@ -161,6 +161,12 @@ public class PlayerManager {
 
     }
 
+    public void exitFullscreen() {
+        if (mPlayerView != null) {
+            mPlayerView.exitFullscreen();
+        }
+    }
+
     class GroupListener implements View.OnAttachStateChangeListener{
 
         @Override

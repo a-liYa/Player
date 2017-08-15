@@ -12,6 +12,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.widget.FrameLayout;
 
+import com.aliya.player.FullscreenActivity;
 import com.aliya.player.PlayerHelper;
 import com.aliya.player.R;
 import com.aliya.player.ui.widget.AspectRatioFrameLayout;
@@ -40,6 +41,7 @@ public class PlayerView extends FrameLayout {
     private AspectRatioFrameLayout contentFrame;
 
     private String mUrl;
+    private boolean fullscreen;
 
     private SimpleExoPlayer player;
     private Controller controller;
@@ -124,6 +126,10 @@ public class PlayerView extends FrameLayout {
         }
     }
 
+    public String getUrl() {
+        return mUrl;
+    }
+
     public void setPlayer(SimpleExoPlayer player) {
         if (this.player == player) {
             return;
@@ -181,7 +187,34 @@ public class PlayerView extends FrameLayout {
      */
     public void syncRegime(PlayerView synced) {
         if (controller != null && synced != null) {
+            fullscreen = synced.fullscreen;
+            mUrl = synced.mUrl;
             controller.syncRegime(synced.controller);
+            controller.updateIcFullscreen(fullscreen);
+        }
+    }
+
+    public void switchFullScreen() {
+        if (fullscreen) {
+            exitFullscreen();
+        } else {
+            startFullScreen();
+        }
+    }
+
+    public void startFullScreen() {
+        fullscreen = true;
+        FullscreenActivity.startActivity(mHelper.getContext(), mUrl);
+        if (controller != null) {
+            controller.updateIcFullscreen(fullscreen);
+        }
+    }
+
+    public void exitFullscreen() {
+        fullscreen = false;
+        // TODO
+        if (controller != null) {
+            controller.updateIcFullscreen(fullscreen);
         }
     }
 

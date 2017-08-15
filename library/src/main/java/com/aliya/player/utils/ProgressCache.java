@@ -10,7 +10,7 @@ import android.util.LruCache;
  */
 public class ProgressCache {
 
-    private static final int DEFAULT_PROGRESS_CACHE_MAX_SIZE = 2; // 默认缓存 max size
+    private static final int DEFAULT_PROGRESS_CACHE_MAX_SIZE = 10; // 默认缓存 max size
     public static final int NO_VALUE = 0;
 
     private LruCache<String, Long> lruCaches; // 最近最少（Least Recently Used）

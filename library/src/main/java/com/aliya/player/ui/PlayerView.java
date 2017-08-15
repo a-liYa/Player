@@ -180,6 +180,10 @@ public class PlayerView extends FrameLayout {
         return player == null;
     }
 
+    public boolean isFullscreen() {
+        return fullscreen;
+    }
+
     /**
      * 同步状态
      *
@@ -190,7 +194,7 @@ public class PlayerView extends FrameLayout {
             fullscreen = synced.fullscreen;
             mUrl = synced.mUrl;
             controller.syncRegime(synced.controller);
-            controller.updateIcFullscreen(fullscreen);
+
         }
     }
 

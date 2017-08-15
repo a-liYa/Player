@@ -132,11 +132,17 @@ public class Controller {
 
         if (navBarControl != null && synced.navBarControl != null) {
             navBarControl.setVisibility(synced.navBarControl.isVisible());
+            if (player != null) {
+                navBarControl.updatePlayPause(player.getPlayWhenReady());
+            }
         }
 
         if (errorControl != null && synced.errorControl != null) {
             errorControl.setVisibility(synced.errorControl.isVisible());
         }
+
+        updateIcFullscreen(playerView.isFullscreen());
+
     }
 
     public void updateIcFullscreen(boolean fullscreen) {

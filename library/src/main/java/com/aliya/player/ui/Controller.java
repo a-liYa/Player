@@ -155,7 +155,9 @@ public class Controller {
                 }
                 bufferControl.setVisibility(false);
             } else if (playbackState == Player.STATE_ENDED) { // 播完毕
-                cacheProgress();
+                if (playerView != null) {
+                    playerView.releasePlayer();
+                }
             }
 
             navBarControl.updatePlayPause(playWhenReady);

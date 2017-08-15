@@ -22,17 +22,6 @@ import java.text.NumberFormat;
 public class Utils {
 
     /**
-     * 计算同步周期时长 预防进度1s更新延迟问题
-     *
-     * @param position position
-     * @return delayMs
-     */
-    public static long calcSyncPeriod(long position) {
-        long delayMs = 1000 - (position % 1000);
-        return delayMs < 200 ? delayMs + 200 : delayMs;
-    }
-
-    /**
      * 下载速度格式化显示
      *
      * @param speed 网速 单位：Byte/s

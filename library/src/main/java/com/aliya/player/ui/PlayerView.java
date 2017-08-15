@@ -159,8 +159,8 @@ public class PlayerView extends FrameLayout {
 
     public void releasePlayer() {
         if (player != null) {
-            controller.cacheProgress();
             if (controller != null) {
+                controller.cacheProgress();
                 controller.setPlayer(null);
             }
             player.release();

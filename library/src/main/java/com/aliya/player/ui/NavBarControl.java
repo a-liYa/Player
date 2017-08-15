@@ -37,7 +37,7 @@ public class NavBarControl extends AbsControl {
 
     private View rootView;
 
-    private CalcTime mCalcTime;
+    private CalcTime calcTime;
     private int showTimeoutMs;
     private long hideAtMs;
     private boolean isAttachedToWindow;
@@ -63,7 +63,7 @@ public class NavBarControl extends AbsControl {
     public NavBarControl(Controller controller) {
         super(controller);
         showTimeoutMs = DEFAULT_SHOW_TIMEOUT_MS;
-        mCalcTime = new CalcTime();
+        calcTime = new CalcTime();
         componentListener = new ComponentListener();
     }
 
@@ -106,19 +106,19 @@ public class NavBarControl extends AbsControl {
         Player player = getPlayer();
         if (player == null) return;
 
-        mCalcTime.calcTime(player);
+        calcTime.calcTime(player);
 
         if (tvPosition != null && !componentListener.seekBarIsDragging) {
-            setText(tvPosition, Utils.formatTime(mCalcTime.position));
+            setText(tvPosition, calcTime.formatPosition());
         }
         if (tvDuration != null) {
-            setText(tvDuration, Utils.formatTime(mCalcTime.duration));
+            setText(tvDuration, calcTime.formatDuration());
         }
 
         if (seekBar != null && seekBar.getVisibility() == VISIBLE) {
-            if (mCalcTime.duration > 0) {
+            if (calcTime.duration > 0) {
                 int progress = (int)
-                        (seekBar.getMax() * mCalcTime.position / mCalcTime.duration + 0.5f);
+                        (seekBar.getMax() * calcTime.position / calcTime.duration + 0.5f);
 
                 if (!componentListener.seekBarIsDragging) {
                     if (progress > seekBar.getMax()) {
@@ -128,7 +128,7 @@ public class NavBarControl extends AbsControl {
                 }
 
                 int bufferProgress = (int)
-                        (seekBar.getMax() * mCalcTime.bufferedPosition / mCalcTime.duration + 0.5f);
+                        (seekBar.getMax() * calcTime.bufferedPosition / calcTime.duration + 0.5f);
                 if (bufferProgress > seekBar.getMax()) {
                     bufferProgress = seekBar.getMax();
                 }
@@ -143,7 +143,7 @@ public class NavBarControl extends AbsControl {
         if (playbackState != Player.STATE_IDLE && playbackState != Player.STATE_ENDED) {
             long delayMs;
             if (player.getPlayWhenReady() && playbackState == Player.STATE_READY) {
-                delayMs = Utils.calcSyncPeriod(mCalcTime.position);
+                delayMs = calcTime.calcSyncPeriod();
             } else {
                 delayMs = 1000;
             }
@@ -233,9 +233,9 @@ public class NavBarControl extends AbsControl {
 
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            if (mCalcTime != null && tvPosition != null) {
+            if (calcTime != null && tvPosition != null) {
                 setText(tvPosition,
-                        Utils.formatTime(mCalcTime.duration * progress / seekBar.getMax()));
+                        Utils.formatTime(calcTime.duration * progress / seekBar.getMax()));
             }
         }
 
@@ -249,7 +249,7 @@ public class NavBarControl extends AbsControl {
         public void onStopTrackingTouch(SeekBar seekBar) {
             seekBarIsDragging = false;
             if (controller != null) {
-                controller.seekTo(mCalcTime.duration * seekBar.getProgress() / seekBar.getMax());
+                controller.seekTo(calcTime.duration * seekBar.getProgress() / seekBar.getMax());
             }
             hideAfterTimeout();
         }

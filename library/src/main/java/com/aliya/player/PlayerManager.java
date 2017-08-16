@@ -122,6 +122,10 @@ public class PlayerManager {
 
     }
 
+    public PlayerView getPlayerView() {
+        return mPlayerView;
+    }
+
     private Runnable smoothSwitchRunnable = new Runnable() {
         @Override
         public void run() {
@@ -161,9 +165,9 @@ public class PlayerManager {
 
     }
 
-    public void exitFullscreen() {
-        if (mPlayerView != null) {
-            mPlayerView.exitFullscreen();
+    public static void setPlayerListenerByView(View view, PlayerListener listener) {
+        if (view != null) {
+            view.setTag(R.id.player_tag_listener, listener);
         }
     }
 

@@ -10,10 +10,13 @@ import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.widget.FrameLayout;
 
 import com.aliya.player.FullscreenActivity;
 import com.aliya.player.PlayerHelper;
+import com.aliya.player.PlayerListener;
 import com.aliya.player.R;
 import com.aliya.player.ui.widget.AspectRatioFrameLayout;
 import com.aliya.player.utils.ProgressCache;
@@ -27,7 +30,10 @@ import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
+import java.lang.ref.SoftReference;
 import java.util.List;
+
+import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
 /**
  * 视频播放 View
@@ -47,6 +53,8 @@ public class PlayerView extends FrameLayout {
     private Controller controller;
     private PlayerHelper mHelper;
     private ComponentListener componentListener;
+
+    private SoftReference<FrameLayout> backupParentSoft;
 
     public PlayerView(@NonNull Context context) {
         this(context, null);
@@ -79,7 +87,7 @@ public class PlayerView extends FrameLayout {
 
         // 2、add surfaceView to video view
         surfaceView = new SurfaceView(context);
-        contentFrame.addView(surfaceView, LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        contentFrame.addView(surfaceView, MATCH_PARENT, MATCH_PARENT);
 
         if (controller != null) {
             // 3、 add controller views
@@ -99,6 +107,7 @@ public class PlayerView extends FrameLayout {
 
     public void play(String url) {
         mUrl = url;
+
         // 1. Create a default TrackSelector
         // 数据传输相关，传输速度、传输监听等
         DefaultBandwidthMeter bandwidthMeter = new DefaultBandwidthMeter();
@@ -124,6 +133,16 @@ public class PlayerView extends FrameLayout {
         if (progress != ProgressCache.NO_VALUE && progress > 0) {
             player.seekTo(progress);
         }
+    }
+
+    public PlayerListener getPlayerListener() {
+        if (getParent() instanceof View) {
+            Object tag = ((View) getParent()).getTag(R.id.player_tag_listener);
+            if (tag instanceof PlayerListener) {
+                return (PlayerListener)tag;
+            }
+        }
+        return null;
     }
 
     public String getUrl() {
@@ -193,6 +212,7 @@ public class PlayerView extends FrameLayout {
         if (controller != null && synced != null) {
             fullscreen = synced.fullscreen;
             mUrl = synced.mUrl;
+            backupParentSoft = synced.backupParentSoft;
             controller.syncRegime(synced.controller);
 
         }
@@ -207,18 +227,37 @@ public class PlayerView extends FrameLayout {
     }
 
     public void startFullScreen() {
+        ViewParent parent = getParent();
+        if (parent instanceof FrameLayout) {
+            backupParentSoft = new SoftReference<>((FrameLayout) parent);
+        }
         fullscreen = true;
         FullscreenActivity.startActivity(mHelper.getContext(), mUrl);
         if (controller != null) {
-            controller.updateIcFullscreen(fullscreen);
+            controller.updateIcFullscreen();
+        }
+        PlayerListener listener = getPlayerListener();
+        if (listener != null) {
+            listener.onChangeFullScreen(true);
         }
     }
 
     public void exitFullscreen() {
         fullscreen = false;
-        // TODO
+        PlayerListener listener = getPlayerListener();
+        if (listener != null) {
+            listener.onChangeFullScreen(false);
+        }
+        FrameLayout backup;
+        if (backupParentSoft != null && (backup = backupParentSoft.get()) != null) {
+            if (getParent() instanceof ViewGroup) {
+                ((ViewGroup)getParent()).removeView(this);
+            }
+            backup.addView(this, MATCH_PARENT, MATCH_PARENT);
+        }
+        backupParentSoft = null;
         if (controller != null) {
-            controller.updateIcFullscreen(fullscreen);
+            controller.updateIcFullscreen();
         }
     }
 

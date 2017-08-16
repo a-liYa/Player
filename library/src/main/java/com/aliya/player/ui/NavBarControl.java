@@ -153,18 +153,18 @@ public class NavBarControl extends AbsControl {
 
     }
 
-    public void updatePlayPause(boolean playWhenReady) {
+    public void updateIcPlayPause(boolean playWhenReady) {
         if (ivPause != null) {
             ivPause.setImageResource(playWhenReady
                     ? R.mipmap.module_player_controls_pause : R.mipmap.module_player_controls_play);
         }
     }
 
-    public void updateIcFullscreen(boolean fullscreen) {
-        if (ivFullscreen != null) {
-            Log.e("TAG", "updateIcFullscreen " + fullscreen);
-            ivFullscreen.setImageResource(fullscreen
-                    ? R.mipmap.module_player_controls_retract: R.mipmap.module_player_controls_spread);
+    public void updateIcFullscreen() {
+        if (ivFullscreen != null && getPlayerView() != null) {
+            ivFullscreen.setImageResource(getPlayerView().isFullscreen()
+                    ? R.mipmap.module_player_controls_retract : R.mipmap
+                    .module_player_controls_spread);
         }
     }
 

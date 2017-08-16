@@ -18,10 +18,10 @@ import android.widget.FrameLayout;
 public class FullscreenActivity extends Activity {
 
     FrameLayout frameContainer;
-    private String mUrl;
+    private String url;
+    private PlayerManager playerManager;
 
     public static final String KEY_URL = "key_url";
-    private PlayerManager playerManager;
 
     public static void startActivity(Context context, String url) {
         Intent intent = new Intent(context, FullscreenActivity.class);
@@ -39,6 +39,7 @@ public class FullscreenActivity extends Activity {
         setContentView(R.layout.activity_fullscreen);
 
         frameContainer = (FrameLayout) findViewById(R.id.frame_container);
+        PlayerManager.setPlayerListenerByView(frameContainer, playerListener);
 
         initUrl(savedInstanceState);
 
@@ -49,20 +50,51 @@ public class FullscreenActivity extends Activity {
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         playerManager = PlayerManager.get();
-        playerManager.play(frameContainer, mUrl);
+        playerManager.play(frameContainer, url);
+        playerManager.getPlayerView();
     }
 
     private void initUrl(Bundle intent) {
         if (intent != null) {
-            mUrl = intent.getString(KEY_URL);
+            url = intent.getString(KEY_URL);
         } else {
-            mUrl = getIntent().getStringExtra(KEY_URL);
+            url = getIntent().getStringExtra(KEY_URL);
         }
     }
 
     @Override
-    public void finish() {
-        super.finish();
-        playerManager.exitFullscreen();
+    public void onBackPressed() {
+        super.onBackPressed();
+        exitFullscreen();
+
     }
+
+    private PlayerListener playerListener = new PlayerListener() {
+        @Override
+        public void onChangeFullScreen(boolean isFullscreen) {
+            if (!isFullscreen && !isFinishing()) {
+                initiativeExitFullscreen();
+            }
+        }
+
+        @Override
+        public void playEnded() {
+            onBackPressed();
+        }
+    };
+
+    /**
+     * 点击播放器内部退出全屏操作
+     */
+    private void initiativeExitFullscreen() {
+        super.onBackPressed();
+    }
+
+    private void exitFullscreen() {
+        if (playerManager != null && playerManager.getPlayerView() != null) {
+            playerManager.getPlayerView().exitFullscreen();
+        }
+    }
+
+
 }

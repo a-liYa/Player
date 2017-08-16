@@ -6,6 +6,7 @@ import android.view.View;
 
 import com.aliya.player.Control;
 import com.aliya.player.Extra;
+import com.aliya.player.PlayerListener;
 import com.aliya.player.R;
 import com.aliya.player.utils.ProgressCache;
 import com.google.android.exoplayer2.C;
@@ -85,6 +86,7 @@ public class Controller {
             }
             this.player = player;
             if (player != null) {
+                setVisibilityControls(false, bufferControl, errorControl);
                 player.addListener(componentListener);
             }
         }
@@ -133,7 +135,7 @@ public class Controller {
         if (navBarControl != null && synced.navBarControl != null) {
             navBarControl.setVisibility(synced.navBarControl.isVisible());
             if (player != null) {
-                navBarControl.updatePlayPause(player.getPlayWhenReady());
+                navBarControl.updateIcPlayPause(player.getPlayWhenReady());
             }
         }
 
@@ -141,13 +143,13 @@ public class Controller {
             errorControl.setVisibility(synced.errorControl.isVisible());
         }
 
-        updateIcFullscreen(playerView.isFullscreen());
+        updateIcFullscreen();
 
     }
 
-    public void updateIcFullscreen(boolean fullscreen) {
+    public void updateIcFullscreen() {
         if (navBarControl != null) {
-            navBarControl.updateIcFullscreen(fullscreen);
+            navBarControl.updateIcFullscreen();
         }
     }
 
@@ -169,10 +171,14 @@ public class Controller {
             } else if (playbackState == Player.STATE_ENDED) { // 播完毕
                 if (playerView != null) {
                     playerView.releasePlayer();
+                    PlayerListener listener = playerView.getPlayerListener();
+                    if (listener != null) {
+                        listener.playEnded();
+                    }
                 }
             }
 
-            navBarControl.updatePlayPause(playWhenReady);
+            navBarControl.updateIcPlayPause(playWhenReady);
             updateControlVisibilityCanSwitch();
         }
 

@@ -214,7 +214,7 @@ public class PlayerView extends FrameLayout {
             mUrl = synced.mUrl;
             backupParentSoft = synced.backupParentSoft;
             controller.syncRegime(synced.controller);
-
+            setKeepScreenOn(synced.getKeepScreenOn());
         }
     }
 

@@ -30,7 +30,7 @@
         android:layout_width="match_parent"
         android:layout_height="300dp"
         android:layout_gravity="center"
-        android:background="#1A1A1A" />
+        android:background="@drawable/video_border"/>
 
     <Button
         android:id="@+id/btn_player"

@@ -178,6 +178,10 @@ public class Controller {
                 }
             }
 
+            if (playerView != null) {
+                playerView.setKeepScreenOn(playWhenReady);
+            }
+
             navBarControl.updateIcPlayPause(playWhenReady);
             updateControlVisibilityCanSwitch();
         }

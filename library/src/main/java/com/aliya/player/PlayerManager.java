@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
+import com.aliya.player.lifecycle.LifecycleUtils;
 import com.aliya.player.ui.PlayerView;
 
 import java.lang.ref.SoftReference;
@@ -29,6 +30,7 @@ public class PlayerManager {
     private PlayerHelper mHelper;
 
     private GroupListener mGroupListener;
+    private PlayerLifecycleImpl mPlayerLifecycle;
 
     private volatile static SoftReference<PlayerManager> sSoftInstance;
 
@@ -36,6 +38,7 @@ public class PlayerManager {
         mHelper = new PlayerHelper();
         mPlayerLayoutParams = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
         mGroupListener = new GroupListener();
+        mPlayerLifecycle = new PlayerLifecycleImpl(this);
     }
 
     public static PlayerManager get() {
@@ -179,7 +182,7 @@ public class PlayerManager {
                 ViewGroup parent = (ViewGroup) v.getParent();
                 // 监听视频控件父布局
                 parent.addOnAttachStateChangeListener(this); // 持有VideoManager引用，防止软引用回收
-//                Utils.addVideoLifecycle(v, mPlayerLifecycle);
+                LifecycleUtils.addVideoLifecycle(v, mPlayerLifecycle);
 //                Object tag = parent.getTag(TAG_KEY_ATTACH_LISTENER);
 //                if (tag != null && tag instanceof View.OnAttachStateChangeListener) {
 //                    ((View.OnAttachStateChangeListener) tag).onViewAttachedToWindow(v);
@@ -197,7 +200,7 @@ public class PlayerManager {
                 // 视频父容器被删除
                 mSmoothPlayerView.releasePlayer();
                 ((ViewGroup) v).removeView(mSmoothPlayerView);
-            }  // else if (v.getId() == R.id.player_view) {
+            }   else if (v.getId() == R.id.player_view) {
 //                final ViewParent parent = v.getParent();
 //                v.post(new Runnable() {
 //                    @Override
@@ -206,12 +209,12 @@ public class PlayerManager {
 //                        ((View) parent).removeOnAttachStateChangeListener(mGroupListener);
 //                    }
 //                });
-//                Utils.removeVideoLifecycle(v);
+                LifecycleUtils.removeVideoLifecycle(v);
 //                Object tag = ((ViewGroup) v.getParent()).getTag(TAG_KEY_ATTACH_LISTENER);
 //                if (tag != null && tag instanceof View.OnAttachStateChangeListener) {
 //                    ((View.OnAttachStateChangeListener) tag).onViewDetachedFromWindow(v);
 //                }
-//            }
+            }
         }
 
     }

@@ -9,8 +9,6 @@ import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
-import com.aliya.player.PlayerManager;
-
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
     FrameLayout parent;

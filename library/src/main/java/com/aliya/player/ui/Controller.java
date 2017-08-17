@@ -170,7 +170,7 @@ public class Controller {
                 bufferControl.setVisibility(false);
             } else if (playbackState == Player.STATE_ENDED) { // 播完毕
                 if (playerView != null) {
-                    playerView.releasePlayer();
+                    playerView.stop();
                     PlayerListener listener = playerView.getPlayerListener();
                     if (listener != null) {
                         listener.playEnded();
@@ -218,8 +218,7 @@ public class Controller {
 
         @Override
         public void onTracksChanged(TrackGroupArray tracks, TrackSelectionArray selections) {
-            // Do nothing.
-            Log.e("TAG", "onTracksChanged ");
+            // Do nothing. 切换视频源
         }
 
         @Override
@@ -231,7 +230,7 @@ public class Controller {
             updateControlVisibilityCanSwitch();
 
             if (playerView != null) {
-                playerView.releasePlayer();
+                playerView.stop();
             }
         }
 

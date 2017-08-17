@@ -16,8 +16,10 @@ import android.widget.FrameLayout;
 
 import com.aliya.player.FullscreenActivity;
 import com.aliya.player.PlayerHelper;
+import com.aliya.player.PlayerLifecycleImpl;
 import com.aliya.player.PlayerListener;
 import com.aliya.player.R;
+import com.aliya.player.lifecycle.LifecycleUtils;
 import com.aliya.player.ui.widget.AspectRatioFrameLayout;
 import com.aliya.player.utils.ProgressCache;
 import com.google.android.exoplayer2.ExoPlayerFactory;
@@ -53,7 +55,7 @@ public class PlayerView extends FrameLayout {
     private Controller controller;
     private PlayerHelper mHelper;
     private ComponentListener componentListener;
-
+    private PlayerLifecycleImpl mPlayerLifecycle;
     private SoftReference<FrameLayout> backupParentSoft;
 
     public PlayerView(@NonNull Context context) {
@@ -73,7 +75,7 @@ public class PlayerView extends FrameLayout {
 
     private void init(Context context) {
         setBackgroundResource(R.color.module_player_background);
-
+        mPlayerLifecycle = new PlayerLifecycleImpl(this);
         controller = new Controller(this);
 
         componentListener = new ComponentListener();
@@ -139,7 +141,7 @@ public class PlayerView extends FrameLayout {
         if (getParent() instanceof View) {
             Object tag = ((View) getParent()).getTag(R.id.player_tag_listener);
             if (tag instanceof PlayerListener) {
-                return (PlayerListener)tag;
+                return (PlayerListener) tag;
             }
         }
         return null;
@@ -182,7 +184,10 @@ public class PlayerView extends FrameLayout {
         return player;
     }
 
-    public void releasePlayer() {
+    /**
+     * 停止播放，并释放player
+     */
+    public void stop() {
         if (player != null) {
             if (controller != null) {
                 controller.cacheProgress();
@@ -195,8 +200,18 @@ public class PlayerView extends FrameLayout {
         }
     }
 
-    public boolean isRelease() {
+    public boolean isStop() {
         return player == null;
+    }
+
+    /**
+     * 释放并从父布局删除
+     */
+    public void release() {
+        stop();
+        if (getParent() instanceof ViewGroup) {
+            ((ViewGroup) getParent()).removeView(this);
+        }
     }
 
     public boolean isFullscreen() {
@@ -251,7 +266,7 @@ public class PlayerView extends FrameLayout {
         FrameLayout backup;
         if (backupParentSoft != null && (backup = backupParentSoft.get()) != null) {
             if (getParent() instanceof ViewGroup) {
-                ((ViewGroup)getParent()).removeView(this);
+                ((ViewGroup) getParent()).removeView(this);
             }
             backup.addView(this, MATCH_PARENT, MATCH_PARENT);
         }
@@ -259,6 +274,18 @@ public class PlayerView extends FrameLayout {
         if (controller != null) {
             controller.updateIcFullscreen();
         }
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        LifecycleUtils.addVideoLifecycle(this, mPlayerLifecycle);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        LifecycleUtils.removeVideoLifecycle(this, mPlayerLifecycle);
     }
 
     private final class ComponentListener implements SimpleExoPlayer.VideoListener,

@@ -1,6 +1,7 @@
 package com.aliya.player.lifecycle;
 
 import android.app.Activity;
+import android.os.Build;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.View;
@@ -22,20 +23,21 @@ public class LifecycleUtils {
         if (playerView == null || playerView.getParent() == null) return;
 
         ViewGroup parent = (ViewGroup) playerView.getParent();
+        if (parent == null) return;
+
         Object fmObject = getFragmentManager(parent);
 
         android.app.FragmentManager fm = null;
-        FragmentManager supportFm = null;
+        FragmentManager v4fm = null;
 
         if (fmObject == null) {
             if (parent.getContext() instanceof Activity) {
-                fm = ((Activity) ((ViewGroup) playerView.getParent()).getContext())
-                        .getFragmentManager();
+                fm = ((Activity) parent.getContext()).getFragmentManager();
             }
         } else if (fmObject instanceof android.app.FragmentManager) {
             fm = (android.app.FragmentManager) fmObject;
         } else if (fmObject instanceof FragmentManager) { // supportFragment
-            supportFm = (FragmentManager) fmObject;
+            v4fm = (FragmentManager) fmObject;
         }
 
         if (fm != null) {
@@ -43,57 +45,52 @@ public class LifecycleUtils {
                     (FRAGMENT_TAG);
             if (current == null || current.isAsyncRemove()) {
                 current = new LifecycleFragment();
-                current.setLifecycleListener(listener);
                 fm.beginTransaction().add(current, FRAGMENT_TAG).commitAllowingStateLoss();
             }
-        }
-
-        if (supportFm != null) {
+            current.setLifecycleListener(listener);
+        } else if (v4fm != null) {
             LifecycleV4Fragment current = (LifecycleV4Fragment)
-                    supportFm.findFragmentByTag(FRAGMENT_TAG);
+                    v4fm.findFragmentByTag(FRAGMENT_TAG);
             if (current == null || current.isAsyncRemove()) {
                 current = new LifecycleV4Fragment();
-                current.setLifecycleListener(listener);
-                supportFm.beginTransaction().add(current, FRAGMENT_TAG).commitAllowingStateLoss();
+                v4fm.beginTransaction().add(current, FRAGMENT_TAG).commitAllowingStateLoss();
             }
+            current.setLifecycleListener(listener);
         }
 
     }
 
-    public static void removeVideoLifecycle(View playerView) {
+    public static void removeVideoLifecycle(View playerView, LifecycleListener listener) {
         if (playerView == null || playerView.getParent() == null) return;
 
         ViewGroup parent = (ViewGroup) playerView.getParent();
         Object fmObject = getFragmentManager(parent);
 
         android.app.FragmentManager fm = null;
-        FragmentManager supportFm = null;
+        FragmentManager v4fm = null;
 
         if (fmObject == null) {
             if (parent.getContext() instanceof Activity) {
-                fm = ((Activity) ((ViewGroup) playerView.getParent()).getContext())
-                        .getFragmentManager();
+                fm = ((Activity) parent.getContext()).getFragmentManager();
             }
         } else if (fmObject instanceof android.app.FragmentManager) {
             fm = (android.app.FragmentManager) fmObject;
         } else if (fmObject instanceof FragmentManager) { // support
-            supportFm = (FragmentManager) fmObject;
+            v4fm = (FragmentManager) fmObject;
         }
 
         if (fm != null) {
             LifecycleFragment current = (LifecycleFragment) fm
                     .findFragmentByTag(FRAGMENT_TAG);
-            if (current != null) {
+            if (current != null && current.getLifecycleListener() == listener) {
                 fm.beginTransaction().remove(current).commitAllowingStateLoss();
                 current.tagAsyncRemove();
             }
-        }
-
-        if (supportFm != null) {
+        } else if (v4fm != null) {
             LifecycleV4Fragment current = (LifecycleV4Fragment)
-                    supportFm.findFragmentByTag(FRAGMENT_TAG);
-            if (current != null) {
-                supportFm.beginTransaction().remove(current).commitAllowingStateLoss();
+                    v4fm.findFragmentByTag(FRAGMENT_TAG);
+            if (current != null && current.getLifecycleListener() == listener) {
+                v4fm.beginTransaction().remove(current).commitAllowingStateLoss();
                 current.tagAsyncRemove();
             }
         }
@@ -109,8 +106,11 @@ public class LifecycleUtils {
             if (parent.getTag(R.id.player_tag_fragment) instanceof android.app.Fragment) {
                 android.app.Fragment fragment = (android.app.Fragment) parent.getTag(R.id
                         .player_tag_fragment);
-                return fragment.getChildFragmentManager();
-
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
+                    return fragment.getChildFragmentManager();
+                } else {
+                    return null;
+                }
             } else if (parent.getTag(R.id.player_tag_fragment) instanceof Fragment) {
                 Fragment supportFragment = (Fragment) parent.getTag(R.id.player_tag_fragment);
                 return supportFragment.getChildFragmentManager();

@@ -3,7 +3,6 @@ package com.aliya.player.simple;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -26,14 +25,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_single).setOnClickListener(this);
         findViewById(R.id.btn_list).setOnClickListener(this);
 
-        Log.e("TAG", "MainActivity " + getWindow());
-
     }
 
     @Override
     protected void onStop() {
         super.onStop();
-//        mPlayerView.releasePlayer();
+//        mPlayerView.stop();
     }
 
     @Override

@@ -1,8 +1,7 @@
 package com.aliya.player;
 
-import android.util.Log;
-
 import com.aliya.player.lifecycle.LifecycleListener;
+import com.aliya.player.ui.PlayerView;
 
 import java.lang.ref.SoftReference;
 
@@ -13,12 +12,11 @@ import java.lang.ref.SoftReference;
  */
 public class PlayerLifecycleImpl implements LifecycleListener {
 
-
-    private SoftReference<PlayerManager> mPlayerSoft;
+    private SoftReference<PlayerView> playerViewSoft;
     private boolean mLifecycleListenerFlag = true;
 
-    public PlayerLifecycleImpl(PlayerManager playerManager) {
-        mPlayerSoft = new SoftReference<>(playerManager);
+    public PlayerLifecycleImpl(PlayerView playerManager) {
+        playerViewSoft = new SoftReference<>(playerManager);
     }
 
     @Override
@@ -33,9 +31,7 @@ public class PlayerLifecycleImpl implements LifecycleListener {
 
     @Override
     public void onPause() {
-        if (mLifecycleListenerFlag) {
             stopPlayer();
-        }
     }
 
     @Override
@@ -45,16 +41,16 @@ public class PlayerLifecycleImpl implements LifecycleListener {
 
     @Override
     public void onHiddenChanged(boolean hidden) {
-        if (hidden && mLifecycleListenerFlag) {
+        if (hidden) {
             stopPlayer();
         }
     }
 
     private void stopPlayer() {
-        if (mPlayerSoft != null && mPlayerSoft.get() != null) {
-            PlayerManager manager = mPlayerSoft.get();
-//            manager.stop();
-            Log.e("TAG", "stopPlayer ");
+        if (mLifecycleListenerFlag) {
+            if (playerViewSoft != null && playerViewSoft.get() != null) {
+                playerViewSoft.get().release();
+            }
         }
     }
 

@@ -25,12 +25,11 @@ public class PlayerManager {
     private PlayerView mSmoothPlayerView;
     private LayoutParams mPlayerLayoutParams;
 
-    private FrameLayout mBackupParent;
     private String mBackupUrl;
     private PlayerHelper mHelper;
 
     private GroupListener mGroupListener;
-    private PlayerLifecycleImpl mPlayerLifecycle;
+
 
     private volatile static SoftReference<PlayerManager> sSoftInstance;
 
@@ -38,7 +37,7 @@ public class PlayerManager {
         mHelper = new PlayerHelper();
         mPlayerLayoutParams = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
         mGroupListener = new GroupListener();
-        mPlayerLifecycle = new PlayerLifecycleImpl(this);
+
     }
 
     public static PlayerManager get() {
@@ -59,13 +58,12 @@ public class PlayerManager {
 
     public void play(FrameLayout parent, String url, int childIndex) {
         if (TextUtils.isEmpty(url) || parent == null) return;
-        mBackupParent = parent;
         mHelper.setContext(parent.getContext());
 
         parent.removeOnAttachStateChangeListener(mGroupListener);
         parent.addOnAttachStateChangeListener(mGroupListener);
 
-        if (TextUtils.equals(mBackupUrl, url) && mPlayerView != null && !mPlayerView.isRelease()) {
+        if (TextUtils.equals(mBackupUrl, url) && mPlayerView != null && !mPlayerView.isStop()) {
             // 同一个url, 且没释放; eg:全屏
             if (mSmoothPlayerView == null) {
                 mSmoothPlayerView = new PlayerView(mHelper.getContext());
@@ -75,6 +73,7 @@ public class PlayerManager {
 
             mSmoothPlayerView.removeOnAttachStateChangeListener(mGroupListener);
             mSmoothPlayerView.addOnAttachStateChangeListener(mGroupListener);
+
             if (mPlayerView != null) {
                 mPlayerView.removeOnAttachStateChangeListener(mGroupListener);
             }
@@ -98,7 +97,10 @@ public class PlayerManager {
                 mPlayerView.setId(R.id.player_view);
             }
 
-            mPlayerView.releasePlayer();
+            mPlayerView.stop();
+
+            mPlayerView.removeOnAttachStateChangeListener(mGroupListener);
+            mPlayerView.addOnAttachStateChangeListener(mGroupListener);
 
             if (mPlayerView.getParent() != parent) {
                 if (mPlayerView.getParent() instanceof ViewGroup) { // 从上一个依附控件中删除
@@ -113,9 +115,6 @@ public class PlayerManager {
                     parent.addView(mPlayerView, childIndex, mPlayerLayoutParams);
                 }
             }
-
-            mPlayerView.removeOnAttachStateChangeListener(mGroupListener);
-            mPlayerView.addOnAttachStateChangeListener(mGroupListener);
 
             mBackupUrl = url;
             mPlayerView.play(url);
@@ -174,7 +173,7 @@ public class PlayerManager {
         }
     }
 
-    class GroupListener implements View.OnAttachStateChangeListener{
+    private final class GroupListener implements View.OnAttachStateChangeListener{
 
         @Override
         public void onViewAttachedToWindow(View v) {
@@ -182,7 +181,7 @@ public class PlayerManager {
                 ViewGroup parent = (ViewGroup) v.getParent();
                 // 监听视频控件父布局
                 parent.addOnAttachStateChangeListener(this); // 持有VideoManager引用，防止软引用回收
-                LifecycleUtils.addVideoLifecycle(v, mPlayerLifecycle);
+
 //                Object tag = parent.getTag(TAG_KEY_ATTACH_LISTENER);
 //                if (tag != null && tag instanceof View.OnAttachStateChangeListener) {
 //                    ((View.OnAttachStateChangeListener) tag).onViewAttachedToWindow(v);
@@ -194,12 +193,10 @@ public class PlayerManager {
         public void onViewDetachedFromWindow(View v) {
             if (mPlayerView != null && mPlayerView.getParent() == v) {
                 // 视频父容器被删除
-                mPlayerView.releasePlayer();
-                ((ViewGroup) v).removeView(mPlayerView);
+                mPlayerView.release();
             } else if (mSmoothPlayerView != null && mSmoothPlayerView.getParent() == v) {
                 // 视频父容器被删除
-                mSmoothPlayerView.releasePlayer();
-                ((ViewGroup) v).removeView(mSmoothPlayerView);
+                mSmoothPlayerView.release();
             }   else if (v.getId() == R.id.player_view) {
 //                final ViewParent parent = v.getParent();
 //                v.post(new Runnable() {
@@ -209,7 +206,6 @@ public class PlayerManager {
 //                        ((View) parent).removeOnAttachStateChangeListener(mGroupListener);
 //                    }
 //                });
-                LifecycleUtils.removeVideoLifecycle(v);
 //                Object tag = ((ViewGroup) v.getParent()).getTag(TAG_KEY_ATTACH_LISTENER);
 //                if (tag != null && tag instanceof View.OnAttachStateChangeListener) {
 //                    ((View.OnAttachStateChangeListener) tag).onViewDetachedFromWindow(v);

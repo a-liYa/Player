@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -54,7 +53,6 @@ public class FullscreenActivity extends Activity {
         playerManager.play(frameContainer, url);
         playerManager.getPlayerView();
 
-        Log.e("TAG", "FullscreenActivity " + getWindow());
     }
 
     private void initUrl(Bundle intent) {

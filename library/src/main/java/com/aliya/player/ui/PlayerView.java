@@ -23,6 +23,7 @@ import com.aliya.player.lifecycle.LifecycleUtils;
 import com.aliya.player.ui.widget.AspectRatioFrameLayout;
 import com.aliya.player.utils.ProgressCache;
 import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.text.Cue;
@@ -34,6 +35,7 @@ import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
 import java.lang.ref.SoftReference;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
@@ -57,6 +59,7 @@ public class PlayerView extends FrameLayout {
     private ComponentListener componentListener;
     private PlayerLifecycleImpl mPlayerLifecycle;
     private SoftReference<FrameLayout> backupParentSoft;
+    private ExecutorService service;
 
     public PlayerView(@NonNull Context context) {
         this(context, null);
@@ -97,6 +100,7 @@ public class PlayerView extends FrameLayout {
 
             controller.onViewCreate();
         }
+        service = PlayerHelper.getThreadExecutor();
     }
 
     public void setPlayerHelper(PlayerHelper helper) {
@@ -193,7 +197,9 @@ public class PlayerView extends FrameLayout {
                 controller.cacheProgress();
                 controller.setPlayer(null);
             }
-            player.release();
+
+            service.execute(new ReleaseRunnable(player));
+
             player.clearTextOutput(componentListener);
             player.clearVideoListener(componentListener);
             player = null;
@@ -202,6 +208,27 @@ public class PlayerView extends FrameLayout {
 
     public boolean isStop() {
         return player == null;
+    }
+
+    private class ReleaseRunnable implements Runnable {
+
+        private Player player;
+
+        public ReleaseRunnable(Player player) {
+            this.player = player;
+        }
+
+        @Override
+        public void run() {
+            if (player != null) {
+                try {
+                    player.release();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                player = null;
+            }
+        }
     }
 
     /**

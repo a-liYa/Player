@@ -23,6 +23,10 @@ import com.google.android.exoplayer2.upstream.DefaultHttpDataSourceFactory;
 import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Util;
 
+import java.lang.ref.SoftReference;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
 /**
  * Player 助手
  *
@@ -102,4 +106,18 @@ public class PlayerHelper {
         }
         return "Player";
     }
+
+
+    private static SoftReference<ExecutorService> threadExecutorSoft;
+
+    public static ExecutorService getThreadExecutor() {
+        ExecutorService service;
+        if (threadExecutorSoft == null || (service = threadExecutorSoft.get()) == null) {
+            service = Executors.newSingleThreadExecutor();
+            threadExecutorSoft = new SoftReference<>(service);
+        }
+        return service;
+    }
+
+
 }

@@ -29,7 +29,6 @@ public class LifecycleFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         isAsyncRemove = false;
-        Log.e("TAG", "onCreate " + this);
     }
 
     @Override
@@ -76,7 +75,6 @@ public class LifecycleFragment extends Fragment {
     public void tagAsyncRemove() {
         mLifecycle = null;
         isAsyncRemove = true;
-        Log.e("TAG", "tagAsyncRemove " + this);
     }
 
     /**

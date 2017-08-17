@@ -20,6 +20,7 @@ public class FullscreenActivity extends Activity {
     FrameLayout frameContainer;
     private String url;
     private PlayerManager playerManager;
+    private Listeners listeners = new Listeners();
 
     public static final String KEY_URL = "key_url";
 
@@ -39,7 +40,7 @@ public class FullscreenActivity extends Activity {
         setContentView(R.layout.activity_fullscreen);
 
         frameContainer = (FrameLayout) findViewById(R.id.frame_container);
-        PlayerManager.setPlayerListenerByView(frameContainer, playerListener);
+        PlayerManager.setPlayerListenerByView(frameContainer, listeners);
 
         initUrl(savedInstanceState);
 
@@ -51,7 +52,7 @@ public class FullscreenActivity extends Activity {
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         playerManager = PlayerManager.get();
         playerManager.play(frameContainer, url);
-        playerManager.getPlayerView();
+        PlayerManager.setPlayerOnAttachStateChangeListener(frameContainer, listeners);
 
     }
 
@@ -67,14 +68,14 @@ public class FullscreenActivity extends Activity {
     public void onBackPressed() {
         super.onBackPressed();
         exitFullscreen();
-
     }
 
-    private PlayerListener playerListener = new PlayerListener() {
+    private class Listeners implements PlayerListener, View.OnAttachStateChangeListener {
+
         @Override
         public void onChangeFullScreen(boolean isFullscreen) {
             if (!isFullscreen && !isFinishing()) {
-                initiativeExitFullscreen();
+                playerInnerExitFullscreen();
             }
         }
 
@@ -82,12 +83,25 @@ public class FullscreenActivity extends Activity {
         public void playEnded() {
             onBackPressed();
         }
-    };
+
+        @Override
+        public void onViewAttachedToWindow(View view) {
+
+        }
+
+        @Override
+        public void onViewDetachedFromWindow(View view) {
+            if (!FullscreenActivity.this.isFinishing()) {
+                FullscreenActivity.this.finish();
+            }
+        }
+
+    }
 
     /**
-     * 点击播放器内部退出全屏操作
+     * 播放器内部退出全屏操作
      */
-    private void initiativeExitFullscreen() {
+    private void playerInnerExitFullscreen() {
         super.onBackPressed();
     }
 

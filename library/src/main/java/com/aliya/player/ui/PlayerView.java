@@ -212,6 +212,7 @@ public class PlayerView extends FrameLayout {
         if (getParent() instanceof ViewGroup) {
             ((ViewGroup) getParent()).removeView(this);
         }
+        fullscreen = false;
     }
 
     public boolean isFullscreen() {
@@ -242,15 +243,13 @@ public class PlayerView extends FrameLayout {
     }
 
     public void startFullScreen() {
+        fullscreen = true;
+        LifecycleUtils.removeVideoLifecycle(this, mPlayerLifecycle);
         ViewParent parent = getParent();
         if (parent instanceof FrameLayout) {
             backupParentSoft = new SoftReference<>((FrameLayout) parent);
         }
-        fullscreen = true;
         FullscreenActivity.startActivity(mHelper.getContext(), mUrl);
-        if (controller != null) {
-            controller.updateIcFullscreen();
-        }
         PlayerListener listener = getPlayerListener();
         if (listener != null) {
             listener.onChangeFullScreen(true);
@@ -259,6 +258,7 @@ public class PlayerView extends FrameLayout {
 
     public void exitFullscreen() {
         fullscreen = false;
+        LifecycleUtils.removeVideoLifecycle(this, mPlayerLifecycle);
         PlayerListener listener = getPlayerListener();
         if (listener != null) {
             listener.onChangeFullScreen(false);
@@ -267,24 +267,23 @@ public class PlayerView extends FrameLayout {
         if (backupParentSoft != null && (backup = backupParentSoft.get()) != null) {
             if (getParent() instanceof ViewGroup) {
                 ((ViewGroup) getParent()).removeView(this);
+                backup.addView(this, MATCH_PARENT, MATCH_PARENT);
             }
-            backup.addView(this, MATCH_PARENT, MATCH_PARENT);
         }
         backupParentSoft = null;
-        if (controller != null) {
-            controller.updateIcFullscreen();
-        }
     }
 
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
+        controller.updateIcFullscreen();
         LifecycleUtils.addVideoLifecycle(this, mPlayerLifecycle);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
+        fullscreen = false;
         LifecycleUtils.removeVideoLifecycle(this, mPlayerLifecycle);
     }
 

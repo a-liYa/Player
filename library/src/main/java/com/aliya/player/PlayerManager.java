@@ -6,7 +6,6 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
-import com.aliya.player.lifecycle.LifecycleUtils;
 import com.aliya.player.ui.PlayerView;
 
 import java.lang.ref.SoftReference;
@@ -167,9 +166,22 @@ public class PlayerManager {
 
     }
 
-    public static void setPlayerListenerByView(View view, PlayerListener listener) {
-        if (view != null) {
-            view.setTag(R.id.player_tag_listener, listener);
+    public static void setPlayerListenerByView(View parent, PlayerListener listener) {
+        if (parent != null) {
+            parent.setTag(R.id.player_tag_listener, listener);
+        }
+    }
+
+    /**
+     * 添加PlayerView的{@link View.OnAttachStateChangeListener}
+     *
+     * @param parent   父容器
+     * @param listener .
+     */
+    public static void setPlayerOnAttachStateChangeListener(View parent, View
+            .OnAttachStateChangeListener listener) {
+        if (parent != null) {
+            parent.setTag(R.id.player_tag_attach_listener, listener);
         }
     }
 
@@ -182,10 +194,10 @@ public class PlayerManager {
                 // 监听视频控件父布局
                 parent.addOnAttachStateChangeListener(this); // 持有VideoManager引用，防止软引用回收
 
-//                Object tag = parent.getTag(TAG_KEY_ATTACH_LISTENER);
-//                if (tag != null && tag instanceof View.OnAttachStateChangeListener) {
-//                    ((View.OnAttachStateChangeListener) tag).onViewAttachedToWindow(v);
-//                }
+                Object tag = parent.getTag(R.id.player_tag_attach_listener);
+                if (tag instanceof View.OnAttachStateChangeListener) {
+                    ((View.OnAttachStateChangeListener) tag).onViewAttachedToWindow(v);
+                }
             }
         }
 
@@ -206,10 +218,10 @@ public class PlayerManager {
 //                        ((View) parent).removeOnAttachStateChangeListener(mGroupListener);
 //                    }
 //                });
-//                Object tag = ((ViewGroup) v.getParent()).getTag(TAG_KEY_ATTACH_LISTENER);
-//                if (tag != null && tag instanceof View.OnAttachStateChangeListener) {
-//                    ((View.OnAttachStateChangeListener) tag).onViewDetachedFromWindow(v);
-//                }
+                Object tag = ((ViewGroup) v.getParent()).getTag(R.id.player_tag_attach_listener);
+                if (tag instanceof View.OnAttachStateChangeListener) {
+                    ((View.OnAttachStateChangeListener) tag).onViewDetachedFromWindow(v);
+                }
             }
         }
 

@@ -18,5 +18,6 @@
     <item name="player_tag_listener" type="id" />
     <item name="player_tag_attach_listener" type="id" />
     <item name="player_tag_fragment" type="id" />
+    <item name="player_tag_reference" type="id" />
 
 </resources>

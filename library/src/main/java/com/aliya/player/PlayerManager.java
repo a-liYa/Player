@@ -1,6 +1,7 @@
 package com.aliya.player;
 
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -59,9 +60,6 @@ public class PlayerManager {
         if (TextUtils.isEmpty(url) || parent == null) return;
         mHelper.setContext(parent.getContext());
 
-        parent.removeOnAttachStateChangeListener(mGroupListener);
-        parent.addOnAttachStateChangeListener(mGroupListener);
-
         if (TextUtils.equals(mBackupUrl, url) && mPlayerView != null && !mPlayerView.isStop()) {
             // 同一个url, 且没释放; eg:全屏
             if (mSmoothPlayerView == null) {
@@ -72,10 +70,6 @@ public class PlayerManager {
 
             mSmoothPlayerView.removeOnAttachStateChangeListener(mGroupListener);
             mSmoothPlayerView.addOnAttachStateChangeListener(mGroupListener);
-
-            if (mPlayerView != null) {
-                mPlayerView.removeOnAttachStateChangeListener(mGroupListener);
-            }
 
             if (childIndex < 0) {
                 parent.addView(mSmoothPlayerView, mPlayerLayoutParams);
@@ -160,7 +154,6 @@ public class PlayerManager {
         // 从上一个依附控件中删除
         if (mSmoothPlayerView.getParent() instanceof ViewGroup) {
             ViewGroup parent = (ViewGroup) mSmoothPlayerView.getParent();
-            parent.removeOnAttachStateChangeListener(mGroupListener);
             parent.removeView(mSmoothPlayerView);
         }
 
@@ -191,14 +184,17 @@ public class PlayerManager {
         }
     }
 
-    private final class GroupListener implements View.OnAttachStateChangeListener{
+    private final class GroupListener implements View.OnAttachStateChangeListener {
 
         @Override
         public void onViewAttachedToWindow(View v) {
             if (v.getId() == R.id.player_view) {
                 ViewGroup parent = (ViewGroup) v.getParent();
-                // 监听视频控件父布局
-                parent.addOnAttachStateChangeListener(this); // 持有VideoManager引用，防止软引用回收
+                parent.removeOnAttachStateChangeListener(this);
+                parent.addOnAttachStateChangeListener(this);
+
+                // 持有PlayerManager引用，防止软引用回收
+                parent.setTag(R.id.player_tag_reference, PlayerManager.this);
 
                 Object tag = parent.getTag(R.id.player_tag_attach_listener);
                 if (tag instanceof View.OnAttachStateChangeListener) {
@@ -215,15 +211,15 @@ public class PlayerManager {
             } else if (mSmoothPlayerView != null && mSmoothPlayerView.getParent() == v) {
                 // 视频父容器被删除
                 mSmoothPlayerView.release();
-            }   else if (v.getId() == R.id.player_view) {
-//                final ViewParent parent = v.getParent();
-//                v.post(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        // 释放VideoManager的引用
-//                        ((View) parent).removeOnAttachStateChangeListener(mGroupListener);
-//                    }
-//                });
+            } else if (v.getId() == R.id.player_view) {
+                final View parent = (View) v.getParent();
+                parent.setTag(R.id.player_tag_reference, null); // 释放PlayerManager引用
+                v.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        parent.removeOnAttachStateChangeListener(GroupListener.this);
+                    }
+                });
                 Object tag = ((ViewGroup) v.getParent()).getTag(R.id.player_tag_attach_listener);
                 if (tag instanceof View.OnAttachStateChangeListener) {
                     ((View.OnAttachStateChangeListener) tag).onViewDetachedFromWindow(v);

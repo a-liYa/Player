@@ -13,7 +13,7 @@ import java.lang.ref.SoftReference;
 public class PlayerLifecycleImpl implements LifecycleListener {
 
     private SoftReference<PlayerView> playerViewSoft;
-    private boolean mLifecycleListenerFlag = true;
+    private boolean lifecycleFollowFlag = true; // true:表示跟随生命周期
 
     public PlayerLifecycleImpl(PlayerView playerManager) {
         playerViewSoft = new SoftReference<>(playerManager);
@@ -31,7 +31,7 @@ public class PlayerLifecycleImpl implements LifecycleListener {
 
     @Override
     public void onPause() {
-            stopPlayer();
+        stopPlayer();
     }
 
     @Override
@@ -46,8 +46,16 @@ public class PlayerLifecycleImpl implements LifecycleListener {
         }
     }
 
+    public boolean isLifecycleFollowFlag() {
+        return lifecycleFollowFlag;
+    }
+
+    public void setLifecycleFollowFlag(boolean lifecycleFollowFlag) {
+        this.lifecycleFollowFlag = lifecycleFollowFlag;
+    }
+
     private void stopPlayer() {
-        if (mLifecycleListenerFlag) {
+        if (lifecycleFollowFlag) {
             if (playerViewSoft != null && playerViewSoft.get() != null) {
                 playerViewSoft.get().release();
             }

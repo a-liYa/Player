@@ -23,7 +23,6 @@ import com.aliya.player.lifecycle.LifecycleUtils;
 import com.aliya.player.ui.widget.AspectRatioFrameLayout;
 import com.aliya.player.utils.ProgressCache;
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
 import com.google.android.exoplayer2.text.Cue;
@@ -55,9 +54,9 @@ public class PlayerView extends FrameLayout {
 
     private SimpleExoPlayer player;
     private Controller controller;
-    private PlayerHelper mHelper;
+    private PlayerHelper helper;
     private ComponentListener componentListener;
-    private PlayerLifecycleImpl mPlayerLifecycle;
+    public PlayerLifecycleImpl playerLifecycle;
     private SoftReference<FrameLayout> backupParentSoft;
     private ExecutorService service;
 
@@ -78,7 +77,7 @@ public class PlayerView extends FrameLayout {
 
     private void init(Context context) {
         setBackgroundResource(R.color.module_player_background);
-        mPlayerLifecycle = new PlayerLifecycleImpl(this);
+        playerLifecycle = new PlayerLifecycleImpl(this);
         controller = new Controller(this);
 
         componentListener = new ComponentListener();
@@ -104,7 +103,7 @@ public class PlayerView extends FrameLayout {
     }
 
     public void setPlayerHelper(PlayerHelper helper) {
-        mHelper = helper;
+        this.helper = helper;
     }
 
     public void replay() {
@@ -127,7 +126,7 @@ public class PlayerView extends FrameLayout {
 
         setPlayer(player);
 
-        MediaSource videoSource = mHelper.buildMediaSource(Uri.parse(url), null, bandwidthMeter);
+        MediaSource videoSource = helper.buildMediaSource(Uri.parse(url), null, bandwidthMeter);
 
         // 3. 准备播放.
         player.prepare(videoSource);
@@ -197,9 +196,7 @@ public class PlayerView extends FrameLayout {
                 controller.cacheProgress();
                 controller.setPlayer(null);
             }
-
             service.execute(new ReleaseRunnable(player));
-
             player.clearTextOutput(componentListener);
             player.clearVideoListener(componentListener);
             player = null;
@@ -212,9 +209,9 @@ public class PlayerView extends FrameLayout {
 
     private class ReleaseRunnable implements Runnable {
 
-        private Player player;
+        private SimpleExoPlayer player;
 
-        public ReleaseRunnable(Player player) {
+        public ReleaseRunnable(SimpleExoPlayer player) {
             this.player = player;
         }
 
@@ -235,10 +232,10 @@ public class PlayerView extends FrameLayout {
      * 释放并从父布局删除
      */
     public void release() {
-        stop();
         if (getParent() instanceof ViewGroup) {
             ((ViewGroup) getParent()).removeView(this);
         }
+        stop();
         fullscreen = false;
     }
 
@@ -247,7 +244,7 @@ public class PlayerView extends FrameLayout {
     }
 
     /**
-     * 同步状态
+     * 同步状态(从另外一个对象中)
      *
      * @param synced 被同步的对象
      */
@@ -257,6 +254,7 @@ public class PlayerView extends FrameLayout {
             mUrl = synced.mUrl;
             backupParentSoft = synced.backupParentSoft;
             controller.syncRegime(synced.controller);
+            playerLifecycle.setLifecycleFollowFlag(synced.playerLifecycle.isLifecycleFollowFlag());
             setKeepScreenOn(synced.getKeepScreenOn());
         }
     }
@@ -271,12 +269,12 @@ public class PlayerView extends FrameLayout {
 
     public void startFullScreen() {
         fullscreen = true;
-        LifecycleUtils.removeVideoLifecycle(this, mPlayerLifecycle);
+        LifecycleUtils.removeVideoLifecycle(this, playerLifecycle);
         ViewParent parent = getParent();
         if (parent instanceof FrameLayout) {
             backupParentSoft = new SoftReference<>((FrameLayout) parent);
         }
-        FullscreenActivity.startActivity(mHelper.getContext(), mUrl);
+        FullscreenActivity.startActivity(helper.getContext(), mUrl);
         PlayerListener listener = getPlayerListener();
         if (listener != null) {
             listener.onChangeFullScreen(true);
@@ -285,7 +283,7 @@ public class PlayerView extends FrameLayout {
 
     public void exitFullscreen() {
         fullscreen = false;
-        LifecycleUtils.removeVideoLifecycle(this, mPlayerLifecycle);
+        LifecycleUtils.removeVideoLifecycle(this, playerLifecycle);
         PlayerListener listener = getPlayerListener();
         if (listener != null) {
             listener.onChangeFullScreen(false);
@@ -304,14 +302,14 @@ public class PlayerView extends FrameLayout {
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
         controller.updateIcFullscreen();
-        LifecycleUtils.addVideoLifecycle(this, mPlayerLifecycle);
+        LifecycleUtils.addVideoLifecycle(this, playerLifecycle);
     }
 
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         fullscreen = false;
-        LifecycleUtils.removeVideoLifecycle(this, mPlayerLifecycle);
+        LifecycleUtils.removeVideoLifecycle(this, playerLifecycle);
     }
 
     private final class ComponentListener implements SimpleExoPlayer.VideoListener,

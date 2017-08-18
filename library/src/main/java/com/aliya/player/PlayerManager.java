@@ -166,6 +166,12 @@ public class PlayerManager {
 
     }
 
+    public void setLifecycleFollow(boolean lifecycleFollow) {
+        if (mPlayerView != null && mPlayerView.playerLifecycle != null) {
+            mPlayerView.playerLifecycle.setLifecycleFollowFlag(lifecycleFollow);
+        }
+    }
+
     public static void setPlayerListenerByView(View parent, PlayerListener listener) {
         if (parent != null) {
             parent.setTag(R.id.player_tag_listener, listener);

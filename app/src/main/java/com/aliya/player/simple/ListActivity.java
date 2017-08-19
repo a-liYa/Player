@@ -26,7 +26,7 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
 
-        mRecyclerView = findViewById(R.id.recycle);
+        mRecyclerView = (RecyclerView) findViewById(R.id.recycle);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(null));
         Adapter adapter = new Adapter(Arrays.asList(VideoUrls.getUrls()));
@@ -76,10 +76,10 @@ public class ListActivity extends AppCompatActivity {
         public ViewHolder(ViewGroup parent) {
             super(LayoutInflater.from(parent.getContext())
                     .inflate(R.layout.item_layout_list, parent, false));
-            mIvBg = itemView.findViewById(R.id.iv_bg);
-            mIvPlayStart = itemView.findViewById(R.id.iv_play_start);
-            mParentPlayer = itemView.findViewById(R.id.parent_player);
-            mTvTitle = itemView.findViewById(R.id.tv_title);
+            mIvBg = (ImageView) itemView.findViewById(R.id.iv_bg);
+            mIvPlayStart = (ImageView) itemView.findViewById(R.id.iv_play_start);
+            mParentPlayer = (FrameLayout) itemView.findViewById(R.id.parent_player);
+            mTvTitle = (TextView) itemView.findViewById(R.id.tv_title);
 
             mIvPlayStart.setOnClickListener(this);
             itemView.findViewById(R.id.ll_info).setOnClickListener(this);

@@ -3,7 +3,7 @@
     package="com.aliya.player">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!--<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />-->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application

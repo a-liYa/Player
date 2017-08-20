@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
-def vCode = 12
-def vName = '0.1.2'
+def vCode = 13
+def vName = '0.1.3'
 def exoplayerVersion = 'r2.5.1'
 
 android {

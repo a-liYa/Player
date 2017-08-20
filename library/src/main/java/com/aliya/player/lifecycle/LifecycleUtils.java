@@ -103,16 +103,16 @@ public class LifecycleUtils {
         }
 
         while (true) {
-            if (parent.getTag(R.id.player_tag_fragment) instanceof android.app.Fragment) {
+            if (parent.getTag(R.id.tag_fragment) instanceof android.app.Fragment) {
                 android.app.Fragment fragment = (android.app.Fragment) parent.getTag(R.id
-                        .player_tag_fragment);
+                        .tag_fragment);
                 if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN) {
                     return fragment.getChildFragmentManager();
                 } else {
                     return null;
                 }
-            } else if (parent.getTag(R.id.player_tag_fragment) instanceof Fragment) {
-                Fragment supportFragment = (Fragment) parent.getTag(R.id.player_tag_fragment);
+            } else if (parent.getTag(R.id.tag_fragment) instanceof Fragment) {
+                Fragment supportFragment = (Fragment) parent.getTag(R.id.tag_fragment);
                 return supportFragment.getChildFragmentManager();
             }
 

@@ -199,6 +199,9 @@ public class PlayerView extends FrameLayout {
             service.execute(new ReleaseRunnable(player));
             player.clearTextOutput(componentListener);
             player.clearVideoListener(componentListener);
+            if (surfaceView instanceof SurfaceView) {
+                player.clearVideoSurfaceView((SurfaceView) surfaceView);
+            }
             player = null;
         }
     }
@@ -232,10 +235,10 @@ public class PlayerView extends FrameLayout {
      * 释放并从父布局删除
      */
     public void release() {
+        stop();
         if (getParent() instanceof ViewGroup) {
             ((ViewGroup) getParent()).removeView(this);
         }
-        stop();
         fullscreen = false;
     }
 

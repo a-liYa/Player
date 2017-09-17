@@ -160,8 +160,8 @@ public class PlayerView extends FrameLayout {
         }
 
         if (this.player != null) {
-            this.player.clearTextOutput(componentListener);
-            this.player.clearVideoListener(componentListener);
+            this.player.removeTextOutput(componentListener);
+            this.player.removeVideoListener(componentListener);
 
             if (surfaceView instanceof SurfaceView) {
                 this.player.clearVideoSurfaceView((SurfaceView) surfaceView);
@@ -178,8 +178,8 @@ public class PlayerView extends FrameLayout {
                 player.setVideoSurfaceView((SurfaceView) surfaceView);
             }
 
-            player.setVideoListener(componentListener);
-            player.setTextOutput(componentListener);
+            player.addVideoListener(componentListener);
+            player.addTextOutput(componentListener);
         }
     }
 
@@ -196,12 +196,16 @@ public class PlayerView extends FrameLayout {
                 controller.cacheProgress();
                 controller.setPlayer(null);
             }
-            service.execute(new ReleaseRunnable(player));
-            player.clearTextOutput(componentListener);
-            player.clearVideoListener(componentListener);
+
+            player.removeTextOutput(componentListener);
+            player.removeVideoListener(componentListener);
             if (surfaceView instanceof SurfaceView) {
                 player.clearVideoSurfaceView((SurfaceView) surfaceView);
             }
+
+            // 必须在 #clearVideoSurfaceView 之后调用，解决异步带来的ANR
+            service.execute(new ReleaseRunnable(player));
+
             player = null;
         }
     }

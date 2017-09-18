@@ -108,9 +108,41 @@ public class Utils {
      * @return true 表示可用
      */
     public static boolean isAvailable(Context context) {
-        NetworkInfo networkInfo = ((ConnectivityManager)
-                context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
+        NetworkInfo networkInfo = getNetworkInfo(context);
         return networkInfo != null && networkInfo.isConnected();
+    }
+
+    /**
+     * 是否为移动网络
+     *
+     * @param context .
+     * @return true:移动网络
+     */
+    public static boolean isMobile(Context context) {
+        NetworkInfo info = getNetworkInfo(context);
+        if (info == null || !info.isAvailable()) {
+            return false;
+        }
+        return ConnectivityManager.TYPE_MOBILE == info.getType();
+    }
+
+    /**
+     * 是否为WiFi网络
+     *
+     * @param context .
+     * @return true：WiFi
+     */
+    public static boolean isWifi(Context context) {
+        NetworkInfo info = getNetworkInfo(context);
+        if (info == null || !info.isAvailable()) {
+            return false;
+        }
+        return ConnectivityManager.TYPE_WIFI == info.getType();
+    }
+
+    private static NetworkInfo getNetworkInfo(Context context) {
+        return ((ConnectivityManager)
+                context.getSystemService(Context.CONNECTIVITY_SERVICE)).getActiveNetworkInfo();
     }
 
     public final static <T extends View> T findViewById(View parent, @IdRes int id) {

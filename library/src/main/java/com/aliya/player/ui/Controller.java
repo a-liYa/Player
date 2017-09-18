@@ -1,5 +1,10 @@
 package com.aliya.player.ui;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
 import android.support.annotation.LayoutRes;
 import android.view.View;
 
@@ -11,9 +16,11 @@ import com.aliya.player.ui.control.BottomProgressControl;
 import com.aliya.player.ui.control.BufferControl;
 import com.aliya.player.ui.control.CalcTime;
 import com.aliya.player.ui.control.ErrorControl;
+import com.aliya.player.ui.control.MobileNetControl;
 import com.aliya.player.ui.control.MuteControl;
 import com.aliya.player.ui.control.NavBarControl;
 import com.aliya.player.utils.ProgressCache;
+import com.aliya.player.utils.Utils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
@@ -39,6 +46,7 @@ public class Controller {
     private ErrorControl errorControl;
     private BottomProgressControl bottomProgressControl;
     private MuteControl muteControl;
+    private MobileNetControl mobileControl;
 
     private PlayerView playerView;
 
@@ -46,6 +54,7 @@ public class Controller {
 
     private ComponentListener componentListener;
     private CalcTime calcTime;
+    private NetStateChangedReceiver netStateReceiver;
 
     private final Runnable updateProgressAction = new Runnable() {
 
@@ -88,6 +97,7 @@ public class Controller {
         bufferControl = new BufferControl(this);
         bottomProgressControl = new BottomProgressControl(this);
         muteControl = new MuteControl(this);
+        mobileControl = new MobileNetControl(this);
 
         calcTime = new CalcTime();
     }
@@ -106,10 +116,12 @@ public class Controller {
         bottomProgressControl.onViewCreate(findViewById(playerView,
                 R.id.player_bottom_progress_bar));
         muteControl.onViewCreate(findViewById(playerView, R.id.player_ic_volume));
+        mobileControl.onViewCreate(findViewById(playerView, R.id.player_stub_mobile_network));
 
         bufferControl.setVisibilityListener(componentListener);
         navBarControl.setVisibilityListener(componentListener);
         errorControl.setVisibilityListener(componentListener);
+        mobileControl.setVisibilityListener(componentListener);
 
         updateControlClickSwitch();
 
@@ -129,6 +141,9 @@ public class Controller {
         if (errorControl != null && errorControl.isVisible()) {
             listener = null;
         }
+        if (mobileControl != null && mobileControl.isVisible()) {
+            listener = null;
+        }
 
         if (playerView != null) {
             playerView.setOnClickListener(listener);
@@ -141,12 +156,14 @@ public class Controller {
                 this.player.removeListener(componentListener);
             }
             this.player = player;
+            unregisterNetStateChange();
             if (player != null) {
                 setVisibilityControls(false, bufferControl, errorControl);
                 player.addListener(componentListener);
                 if (muteControl != null) {
                     muteControl.updateVolume();
                 }
+                registerNetStateChange();
             }
         }
     }
@@ -216,6 +233,42 @@ public class Controller {
 
     public CalcTime getCalcTime() {
         return calcTime;
+    }
+
+    private void registerNetStateChange() {
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        if (netStateReceiver == null) {
+            netStateReceiver = new NetStateChangedReceiver();
+        }
+        if (getContext() != null) {
+            getContext().registerReceiver(netStateReceiver, filter);
+        }
+    }
+
+    private void unregisterNetStateChange() {
+        if (netStateReceiver != null) {
+            try {
+                if (getContext() != null) {
+                    getContext().unregisterReceiver(netStateReceiver);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public Context getContext() {
+        if (playerView != null) {
+            return playerView.getContext();
+        }
+        return null;
+    }
+
+    private void showMobileNetwork() {
+        if (mobileControl != null) {
+            mobileControl.setVisibility(true);
+        }
     }
 
     private final class ComponentListener implements Player.EventListener, View.OnClickListener,
@@ -319,9 +372,12 @@ public class Controller {
                 } else if (control == navBarControl) {
                     setVisibilityControls(false, bottomProgressControl);
                     setVisibilityControls(true, muteControl);
+                } else if (control == mobileControl) {
+                    setVisibilityControls(false, navBarControl, bufferControl,
+                            bottomProgressControl);
                 }
             } else {
-                if (control == errorControl) {
+                if (control == errorControl || control == mobileControl) {
                     updateControlClickSwitch();
                 } else if (control == navBarControl) {
                     if (!errorControl.isVisible() && !bufferControl.isVisible()) {
@@ -339,6 +395,29 @@ public class Controller {
                 }
             }
         }
+    }
+
+    /**
+     * 网络状态的变化监听
+     */
+    class NetStateChangedReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            switch (intent.getAction()) {
+                case ConnectivityManager.CONNECTIVITY_ACTION:
+                    if (intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, -1)
+                            == ConnectivityManager.TYPE_MOBILE) {
+                        // 移动网络有变化，切走或切回
+                        if (Utils.isMobile(context)) { // 切换到移动网络
+                            showMobileNetwork();
+                        }
+                    }
+                    break;
+            }
+        }
+
     }
 
 }

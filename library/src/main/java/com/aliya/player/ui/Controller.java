@@ -111,7 +111,7 @@ public class Controller {
         navBarControl.setVisibilityListener(componentListener);
         errorControl.setVisibilityListener(componentListener);
 
-        updateControlVisibilityCanSwitch();
+        updateControlClickSwitch();
 
     }
 
@@ -121,7 +121,7 @@ public class Controller {
         }
     }
 
-    private void updateControlVisibilityCanSwitch() {
+    private void updateControlClickSwitch() {
         View.OnClickListener listener = componentListener;
         if (bufferControl != null && bufferControl.isVisible()) {
             listener = null;
@@ -232,6 +232,8 @@ public class Controller {
             } else if (playbackState == Player.STATE_ENDED) { // 播完毕
                 if (playerView != null) {
                     playerView.stop();
+                    errorControl.showPlayEnded();
+                    updateControlClickSwitch();
                     PlayerListener listener = playerView.getPlayerListener();
                     if (listener != null) {
                         listener.playEnded();
@@ -248,7 +250,7 @@ public class Controller {
             }
 
             navBarControl.updateIcPlayPause(playWhenReady);
-            updateControlVisibilityCanSwitch();
+            updateControlClickSwitch();
         }
 
         @Override
@@ -290,7 +292,7 @@ public class Controller {
             if (errorControl != null) {
                 errorControl.setVisibility(true);
             }
-            updateControlVisibilityCanSwitch();
+            updateControlClickSwitch();
 
             if (playerView != null) {
                 playerView.stop();
@@ -320,7 +322,7 @@ public class Controller {
                 }
             } else {
                 if (control == errorControl) {
-                    updateControlVisibilityCanSwitch();
+                    updateControlClickSwitch();
                 } else if (control == navBarControl) {
                     if (!errorControl.isVisible() && !bufferControl.isVisible()) {
                         setVisibilityControls(true, bottomProgressControl);

@@ -6,19 +6,20 @@
     android:gravity="center"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="播放失败"
-        android:textColor="@android:color/white"
-        android:textSize="14sp" />
-
     <ImageView
         android:id="@id/player_click_retry"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
         android:foreground="?android:attr/actionBarItemBackground"
         android:src="@mipmap/module_player_controls_replay" />
+
+    <TextView
+        android:id="@id/player_tv_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="播放失败"
+        android:textColor="@android:color/white"
+        android:textSize="14sp" />
 
 </LinearLayout>

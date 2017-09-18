@@ -57,9 +57,10 @@ public class PlayerView extends FrameLayout {
     private Controller controller;
     private PlayerHelper helper;
     private ComponentListener componentListener;
-    public PlayerLifecycleImpl playerLifecycle;
     private SoftReference<FrameLayout> backupParentSoft;
     private ExecutorService service;
+
+    public PlayerLifecycleImpl playerLifecycle;
 
     public PlayerView(@NonNull Context context) {
         this(context, null);

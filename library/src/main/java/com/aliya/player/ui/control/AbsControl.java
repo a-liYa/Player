@@ -1,6 +1,8 @@
-package com.aliya.player.ui;
+package com.aliya.player.ui.control;
 
 import com.aliya.player.Control;
+import com.aliya.player.ui.Controller;
+import com.aliya.player.ui.PlayerView;
 import com.google.android.exoplayer2.Player;
 
 /**

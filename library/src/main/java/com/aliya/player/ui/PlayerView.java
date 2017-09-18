@@ -1,6 +1,7 @@
 package com.aliya.player.ui;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.net.Uri;
 import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
@@ -76,7 +77,7 @@ public class PlayerView extends FrameLayout {
     }
 
     private void init(Context context) {
-        setBackgroundResource(R.color.module_player_background);
+        setBackgroundColor(Color.BLACK);
         playerLifecycle = new PlayerLifecycleImpl(this);
         controller = new Controller(this);
 

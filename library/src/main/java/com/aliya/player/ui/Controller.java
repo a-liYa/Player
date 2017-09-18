@@ -1,5 +1,6 @@
 package com.aliya.player.ui;
 
+import android.os.SystemClock;
 import android.support.annotation.LayoutRes;
 import android.util.Log;
 import android.view.View;
@@ -8,6 +9,11 @@ import com.aliya.player.Control;
 import com.aliya.player.Extra;
 import com.aliya.player.PlayerListener;
 import com.aliya.player.R;
+import com.aliya.player.ui.control.BottomProgressControl;
+import com.aliya.player.ui.control.BufferControl;
+import com.aliya.player.ui.control.CalcTime;
+import com.aliya.player.ui.control.ErrorControl;
+import com.aliya.player.ui.control.NavBarControl;
 import com.aliya.player.utils.ProgressCache;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -32,12 +38,50 @@ public class Controller {
     private BufferControl bufferControl;
     private NavBarControl navBarControl;
     private ErrorControl errorControl;
+    private BottomProgressControl bottomProgressControl;
 
     private PlayerView playerView;
 
     private Player player;
 
-    private final ComponentListener componentListener;
+    private ComponentListener componentListener;
+    private CalcTime calcTime;
+
+    private final Runnable updateProgressAction = new Runnable() {
+
+        long time;
+
+        @Override
+        public void run() {
+            if (player == null) return;
+
+            calcTime.calcTime(player);
+
+            if (navBarControl != null) {
+                navBarControl.updateProgress();
+            }
+            if (bottomProgressControl != null) {
+                bottomProgressControl.updateProgress();
+            }
+
+            // Cancel any pending updates and schedule a new one if necessary.
+            stopUpdateProgress();
+            Log.e("TAG", "updateProgressAction run " + (SystemClock.uptimeMillis() - time));
+            time = SystemClock.uptimeMillis();
+            int playbackState = player == null ? Player.STATE_IDLE : player.getPlaybackState();
+            if (playbackState != Player.STATE_IDLE && playbackState != Player.STATE_ENDED) {
+                long delayMs;
+                if (player.getPlayWhenReady() && playbackState == Player.STATE_READY) {
+                    delayMs = calcTime.calcSyncPeriod();
+                } else {
+                    delayMs = 1000;
+                }
+                if (playerView != null) {
+                    playerView.postDelayed(updateProgressAction, delayMs);
+                }
+            }
+        }
+    };
 
     public Controller(PlayerView parentView) {
         this.playerView = parentView;
@@ -45,6 +89,9 @@ public class Controller {
         navBarControl = new NavBarControl(this);
         errorControl = new ErrorControl(this);
         bufferControl = new BufferControl(this);
+        bottomProgressControl = new BottomProgressControl(this);
+
+        calcTime = new CalcTime();
     }
 
     public
@@ -54,15 +101,25 @@ public class Controller {
     }
 
     public void onViewCreate() {
+
         bufferControl.onViewCreate(findViewById(playerView, R.id.player_buffer_progress));
         navBarControl.onViewCreate(findViewById(playerView, R.id.player_control_bar));
         errorControl.onViewCreate(findViewById(playerView, R.id.player_stub_play_error));
+        bottomProgressControl.onViewCreate(findViewById(playerView, R.id
+                .player_bottom_progress_bar));
 
         bufferControl.setVisibilityListener(componentListener);
         navBarControl.setVisibilityListener(componentListener);
         errorControl.setVisibilityListener(componentListener);
 
         updateControlVisibilityCanSwitch();
+
+    }
+
+    public void stopUpdateProgress() {
+        if (playerView != null) {
+            playerView.removeCallbacks(updateProgressAction);
+        }
     }
 
     private void updateControlVisibilityCanSwitch() {
@@ -143,6 +200,8 @@ public class Controller {
             errorControl.setVisibility(synced.errorControl.isVisible());
         }
 
+        updateProgressAction.run();
+
         updateIcFullscreen();
 
     }
@@ -153,20 +212,20 @@ public class Controller {
         }
     }
 
+    public CalcTime getCalcTime() {
+        return calcTime;
+    }
+
     private final class ComponentListener implements Player.EventListener, View.OnClickListener,
             Control.VisibilityListener {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             if (playbackState == Player.STATE_BUFFERING) { // 缓冲
-                if (navBarControl != null) {
-                    navBarControl.stopUpdateProgress();
-                }
+                stopUpdateProgress();
                 bufferControl.setVisibility(true);
             } else if (playbackState == Player.STATE_READY) { // 播放
-                if (navBarControl != null) {
-                    navBarControl.updateProgress();
-                }
+                updateProgressAction.run();
                 bufferControl.setVisibility(false);
             } else if (playbackState == Player.STATE_ENDED) { // 播完毕
                 if (playerView != null) {
@@ -176,6 +235,10 @@ public class Controller {
                         listener.playEnded();
                     }
                 }
+            }
+
+            if (!playWhenReady) { // 停止播放
+                stopUpdateProgress();
             }
 
             if (playerView != null) {
@@ -247,13 +310,28 @@ public class Controller {
         public void onVisibilityChange(Control control, boolean isVisible) {
             if (isVisible) {
                 if (control == bufferControl) {
-                    setVisibilityControls(false, navBarControl);
+                    setVisibilityControls(false, navBarControl, bottomProgressControl);
                 } else if (control == errorControl) {
-                    setVisibilityControls(false, navBarControl, bufferControl);
+                    setVisibilityControls(false, navBarControl, bufferControl,
+                            bottomProgressControl);
+                } else if (control == navBarControl) {
+                    setVisibilityControls(false, bottomProgressControl);
                 }
             } else {
                 if (control == errorControl) {
                     updateControlVisibilityCanSwitch();
+                } else if (control == navBarControl) {
+                    if (!errorControl.isVisible() && !bufferControl.isVisible()) {
+                        setVisibilityControls(true, bottomProgressControl);
+                    }
+                } else if (control == bufferControl) {
+                    if (!navBarControl.isVisible()) {
+                        setVisibilityControls(true, bottomProgressControl);
+                    }
+                } else if (control == errorControl) {
+                    if (!navBarControl.isVisible()) {
+                        setVisibilityControls(true, bottomProgressControl);
+                    }
                 }
             }
         }

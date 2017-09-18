@@ -1,10 +1,12 @@
-package com.aliya.player.ui;
+package com.aliya.player.ui.control;
 
 import android.view.View;
 import android.view.ViewStub;
 import android.widget.Toast;
 
 import com.aliya.player.R;
+import com.aliya.player.ui.Controller;
+import com.aliya.player.ui.PlayerView;
 import com.aliya.player.utils.Utils;
 
 /**

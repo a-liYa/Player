@@ -1,14 +1,14 @@
-package com.aliya.player.ui;
+package com.aliya.player.ui.control;
 
 import android.os.SystemClock;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.aliya.player.FullscreenActivity;
 import com.aliya.player.R;
+import com.aliya.player.ui.Controller;
+import com.aliya.player.ui.PlayerView;
 import com.aliya.player.utils.Utils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
@@ -38,7 +38,6 @@ public class NavBarControl extends AbsControl {
 
     private View rootView;
 
-    private CalcTime calcTime;
     private int showTimeoutMs;
     private long hideAtMs;
     private boolean isAttachedToWindow;
@@ -46,13 +45,6 @@ public class NavBarControl extends AbsControl {
     private ComponentListener componentListener;
 
     public static final int DEFAULT_SHOW_TIMEOUT_MS = 3000;
-
-    private final Runnable updateProgressAction = new Runnable() {
-        @Override
-        public void run() {
-            updateProgress();
-        }
-    };
 
     private final Runnable hideAction = new Runnable() {
         @Override
@@ -64,7 +56,6 @@ public class NavBarControl extends AbsControl {
     public NavBarControl(Controller controller) {
         super(controller);
         showTimeoutMs = DEFAULT_SHOW_TIMEOUT_MS;
-        calcTime = new CalcTime();
         componentListener = new ComponentListener();
     }
 
@@ -96,18 +87,9 @@ public class NavBarControl extends AbsControl {
 
     }
 
-    public void stopUpdateProgress() {
-        if (rootView != null) {
-            rootView.removeCallbacks(updateProgressAction);
-        }
-    }
-
     public void updateProgress() {
 
-        Player player = getPlayer();
-        if (player == null) return;
-
-        calcTime.calcTime(player);
+        CalcTime calcTime = controller.getCalcTime();
 
         if (tvPosition != null && !componentListener.seekBarIsDragging) {
             setText(tvPosition, calcTime.formatPosition());
@@ -118,8 +100,7 @@ public class NavBarControl extends AbsControl {
 
         if (seekBar != null && seekBar.getVisibility() == VISIBLE) {
             if (calcTime.duration > 0) {
-                int progress = (int)
-                        (seekBar.getMax() * calcTime.position / calcTime.duration + 0.5f);
+                int progress = calcTime.calcProgress(seekBar.getMax());
 
                 if (!componentListener.seekBarIsDragging) {
                     if (progress > seekBar.getMax()) {
@@ -128,27 +109,13 @@ public class NavBarControl extends AbsControl {
                     seekBar.setProgress(progress);
                 }
 
-                int bufferProgress = (int)
-                        (seekBar.getMax() * calcTime.bufferedPosition / calcTime.duration + 0.5f);
+                int bufferProgress = calcTime.calcSecondaryProgress(seekBar.getMax());
+
                 if (bufferProgress > seekBar.getMax()) {
                     bufferProgress = seekBar.getMax();
                 }
                 seekBar.setSecondaryProgress(bufferProgress);
             }
-        }
-
-        // Cancel any pending updates and schedule a new one if necessary.
-        stopUpdateProgress();
-
-        int playbackState = player == null ? Player.STATE_IDLE : player.getPlaybackState();
-        if (playbackState != Player.STATE_IDLE && playbackState != Player.STATE_ENDED) {
-            long delayMs;
-            if (player.getPlayWhenReady() && playbackState == Player.STATE_READY) {
-                delayMs = calcTime.calcSyncPeriod();
-            } else {
-                delayMs = 1000;
-            }
-            rootView.postDelayed(updateProgressAction, delayMs);
         }
 
     }
@@ -198,7 +165,6 @@ public class NavBarControl extends AbsControl {
                 hideAfterTimeout();
             } else {
                 rootView.removeCallbacks(hideAction);
-                stopUpdateProgress();
                 hideAtMs = C.TIME_UNSET;
             }
         }
@@ -245,9 +211,9 @@ public class NavBarControl extends AbsControl {
 
         @Override
         public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-            if (calcTime != null && tvPosition != null) {
-                setText(tvPosition,
-                        Utils.formatTime(calcTime.duration * progress / seekBar.getMax()));
+            if (tvPosition != null) {
+                setText(tvPosition, Utils.formatTime(
+                        controller.getCalcTime().duration * progress / seekBar.getMax()));
             }
         }
 
@@ -260,9 +226,8 @@ public class NavBarControl extends AbsControl {
         @Override
         public void onStopTrackingTouch(SeekBar seekBar) {
             seekBarIsDragging = false;
-            if (controller != null) {
-                controller.seekTo(calcTime.duration * seekBar.getProgress() / seekBar.getMax());
-            }
+            controller.seekTo(
+                    controller.getCalcTime().duration * seekBar.getProgress() / seekBar.getMax());
             hideAfterTimeout();
         }
 

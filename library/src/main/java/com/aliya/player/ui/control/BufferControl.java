@@ -1,15 +1,17 @@
-package com.aliya.player.ui;
+package com.aliya.player.ui.control;
 
 import android.view.View;
 import android.widget.ProgressBar;
 
+import com.aliya.player.ui.Controller;
+
 /**
- * BufferControl
+ * BufferControl - 缓冲
  *
  * @author a_liYa
  * @date 2017/8/13 16:58.
  */
-class BufferControl extends AbsControl {
+public class BufferControl extends AbsControl {
 
     private ProgressBar bufferProgress;
 

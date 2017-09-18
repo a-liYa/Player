@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="module_player_background">#1a1a1a</color>
-
     <color name="module_player_seek_bar_background">#4cffffff</color>
     <color name="module_player_seek_bar_secondary_progress">#b2b2b2</color>
     <color name="module_player_seek_bar_progress">#ffffff</color>

@@ -1,8 +1,6 @@
 package com.aliya.player.ui;
 
-import android.os.SystemClock;
 import android.support.annotation.LayoutRes;
-import android.util.Log;
 import android.view.View;
 
 import com.aliya.player.Control;
@@ -13,6 +11,7 @@ import com.aliya.player.ui.control.BottomProgressControl;
 import com.aliya.player.ui.control.BufferControl;
 import com.aliya.player.ui.control.CalcTime;
 import com.aliya.player.ui.control.ErrorControl;
+import com.aliya.player.ui.control.MuteControl;
 import com.aliya.player.ui.control.NavBarControl;
 import com.aliya.player.utils.ProgressCache;
 import com.google.android.exoplayer2.C;
@@ -39,17 +38,16 @@ public class Controller {
     private NavBarControl navBarControl;
     private ErrorControl errorControl;
     private BottomProgressControl bottomProgressControl;
+    private MuteControl muteControl;
 
     private PlayerView playerView;
 
-    private Player player;
+    private SimpleExoPlayer player;
 
     private ComponentListener componentListener;
     private CalcTime calcTime;
 
     private final Runnable updateProgressAction = new Runnable() {
-
-        long time;
 
         @Override
         public void run() {
@@ -66,8 +64,7 @@ public class Controller {
 
             // Cancel any pending updates and schedule a new one if necessary.
             stopUpdateProgress();
-            Log.e("TAG", "updateProgressAction run " + (SystemClock.uptimeMillis() - time));
-            time = SystemClock.uptimeMillis();
+
             int playbackState = player == null ? Player.STATE_IDLE : player.getPlaybackState();
             if (playbackState != Player.STATE_IDLE && playbackState != Player.STATE_ENDED) {
                 long delayMs;
@@ -90,6 +87,7 @@ public class Controller {
         errorControl = new ErrorControl(this);
         bufferControl = new BufferControl(this);
         bottomProgressControl = new BottomProgressControl(this);
+        muteControl = new MuteControl(this);
 
         calcTime = new CalcTime();
     }
@@ -105,8 +103,9 @@ public class Controller {
         bufferControl.onViewCreate(findViewById(playerView, R.id.player_buffer_progress));
         navBarControl.onViewCreate(findViewById(playerView, R.id.player_control_bar));
         errorControl.onViewCreate(findViewById(playerView, R.id.player_stub_play_error));
-        bottomProgressControl.onViewCreate(findViewById(playerView, R.id
-                .player_bottom_progress_bar));
+        bottomProgressControl.onViewCreate(findViewById(playerView,
+                R.id.player_bottom_progress_bar));
+        muteControl.onViewCreate(findViewById(playerView, R.id.player_ic_volume));
 
         bufferControl.setVisibilityListener(componentListener);
         navBarControl.setVisibilityListener(componentListener);
@@ -145,11 +144,14 @@ public class Controller {
             if (player != null) {
                 setVisibilityControls(false, bufferControl, errorControl);
                 player.addListener(componentListener);
+                if (muteControl != null) {
+                    muteControl.updateVolume();
+                }
             }
         }
     }
 
-    public Player getPlayer() {
+    public SimpleExoPlayer getPlayer() {
         return player;
     }
 
@@ -251,7 +253,6 @@ public class Controller {
 
         @Override
         public void onRepeatModeChanged(int repeatMode) {
-            Log.e("TAG", "onRepeatModeChanged " + repeatMode);
         }
 
         @Override
@@ -264,7 +265,6 @@ public class Controller {
         @Override
         public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
             // Do nothing.
-            Log.e("TAG", "onPlaybackParametersChanged ");
         }
 
         @Override
@@ -316,6 +316,7 @@ public class Controller {
                             bottomProgressControl);
                 } else if (control == navBarControl) {
                     setVisibilityControls(false, bottomProgressControl);
+                    setVisibilityControls(true, muteControl);
                 }
             } else {
                 if (control == errorControl) {
@@ -324,6 +325,7 @@ public class Controller {
                     if (!errorControl.isVisible() && !bufferControl.isVisible()) {
                         setVisibilityControls(true, bottomProgressControl);
                     }
+                    setVisibilityControls(false, muteControl);
                 } else if (control == bufferControl) {
                     if (!navBarControl.isVisible()) {
                         setVisibilityControls(true, bottomProgressControl);

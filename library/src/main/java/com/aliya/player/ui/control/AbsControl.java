@@ -3,7 +3,7 @@ package com.aliya.player.ui.control;
 import com.aliya.player.Control;
 import com.aliya.player.ui.Controller;
 import com.aliya.player.ui.PlayerView;
-import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
 
 /**
  * AbsControl is Control abstract implementation
@@ -21,7 +21,7 @@ abstract class AbsControl implements Control {
     }
 
     @Override
-    public Player getPlayer() {
+    public SimpleExoPlayer getPlayer() {
         return controller != null ? controller.getPlayer() : null;
     }
 

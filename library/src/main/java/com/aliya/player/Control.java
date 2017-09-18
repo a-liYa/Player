@@ -3,7 +3,7 @@ package com.aliya.player;
 import android.view.View;
 
 import com.aliya.player.ui.PlayerView;
-import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
 
 /**
  * Control is player a modular interface，
@@ -19,7 +19,7 @@ public interface Control {
 
     void setVisibility(boolean isVisible);
 
-    Player getPlayer();
+    SimpleExoPlayer getPlayer();
 
     PlayerView getPlayerView();
 

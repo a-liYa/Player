@@ -11,6 +11,7 @@
     <item name="player_bottom_progress_bar" type="id" />
 
     <item name="player_click_retry" type="id" />
+    <item name="player_ic_volume" type="id" />
     <item name="player_stub_play_error" type="id" />
 
     <item name="player_view" type="id" />

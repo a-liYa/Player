@@ -1,13 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="module_player_seek_bar_background">#4cffffff</color>
-    <color name="module_player_seek_bar_secondary_progress">#b2b2b2</color>
+    <color name="module_player_seek_bar_background">#878686</color>
+    <color name="module_player_seek_bar_secondary_progress">#5f5f5f</color>
     <color name="module_player_seek_bar_progress">#ffffff</color>
     <color name="module_player_seek_bar_thumb">#ffffff</color>
 
+    <color name="module_player_progress_bar_background">#000000</color>
+    <color name="module_player_progress_bar_secondary_progress">#787878</color>
+    <color name="module_player_progress_bar_progress">#f44b50</color>
+
     <color name="module_player_buffer_progress_start_color">@android:color/transparent</color>
     <color name="module_player_buffer_progress_center_color">#FFFFFF</color>
-    <color name="module_player_buffer_progress_end_color">#d12324</color>
+    <color name="module_player_buffer_progress_end_color">#5f5f5f</color>
 
 </resources>

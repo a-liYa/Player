@@ -38,7 +38,7 @@ public class FullscreenActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_fullscreen);
+        setContentView(R.layout.module_palyer_activity_fullscreen);
 
         frameContainer = (FrameLayout) findViewById(R.id.frame_container);
         PlayerManager.setPlayerListenerByView(frameContainer, listeners);

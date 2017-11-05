@@ -12,6 +12,7 @@ import com.aliya.player.ui.PlayerView;
 import com.aliya.player.utils.Utils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.SimpleExoPlayer;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -195,7 +196,7 @@ public class NavBarControl extends AbsControl {
 
         @Override
         public void onClick(View v) {
-            Player player = getPlayer();
+            final Player player = getPlayer();
             if (player != null) {
                 if (v.getId() == R.id.player_play_pause) {
                     player.setPlayWhenReady(!player.getPlayWhenReady());
@@ -228,6 +229,11 @@ public class NavBarControl extends AbsControl {
             seekBarIsDragging = false;
             controller.seekTo(
                     controller.getCalcTime().duration * seekBar.getProgress() / seekBar.getMax());
+            // 暂停时，拖动进度，自动播放
+            final Player player = getPlayer();
+            if (player != null && !player.getPlayWhenReady()) {
+                player.setPlayWhenReady(true);
+            }
             hideAfterTimeout();
         }
 

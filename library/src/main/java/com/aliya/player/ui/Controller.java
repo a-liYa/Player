@@ -19,7 +19,7 @@ import com.aliya.player.ui.control.ErrorControl;
 import com.aliya.player.ui.control.MobileNetControl;
 import com.aliya.player.ui.control.MuteControl;
 import com.aliya.player.ui.control.NavBarControl;
-import com.aliya.player.utils.ProgressCache;
+import com.aliya.player.utils.Recorder;
 import com.aliya.player.utils.Utils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -158,7 +158,7 @@ public class Controller {
             this.player = player;
             unregisterNetStateChange();
             if (player != null) {
-                setVisibilityControls(false, bufferControl, errorControl);
+                setVisibilityControls(false, bufferControl, errorControl, mobileControl);
                 player.addListener(componentListener);
                 if (muteControl != null) {
                     muteControl.updateVolume();
@@ -188,9 +188,9 @@ public class Controller {
                 || player.getDuration() == C.TIME_UNSET) return;
 
         if (Math.abs(player.getDuration() - player.getCurrentPosition()) < 1000) {
-            ProgressCache.get().removeCacheProgress(Extra.getExtraUrl(playerView));
+            Recorder.get().removeCacheProgress(Extra.getExtraUrl(playerView));
         } else {
-            ProgressCache.get()
+            Recorder.get()
                     .putCacheProgress(Extra.getExtraUrl(playerView), player.getCurrentPosition());
         }
 

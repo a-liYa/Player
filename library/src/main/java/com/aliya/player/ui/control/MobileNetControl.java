@@ -1,10 +1,14 @@
 package com.aliya.player.ui.control;
 
+import android.view.Gravity;
 import android.view.View;
 import android.view.ViewStub;
+import android.widget.Toast;
 
+import com.aliya.player.Extra;
 import com.aliya.player.R;
 import com.aliya.player.ui.Controller;
+import com.aliya.player.utils.Recorder;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 
 /**
@@ -37,6 +41,15 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
 
     @Override
     public void setVisibility(boolean isVisible) {
+        // 以及阻塞提醒，直接toast提醒就行
+        if (isVisible && Recorder.get().isAllowMobileTraffic(Extra.getExtraUrl(getPlayerView()))) {
+            Toast toast = Toast.makeText(getPlayerView().getContext(), R.string
+                    .player_mobile_traffic_alert, Toast.LENGTH_SHORT);
+            toast.setGravity(Gravity.CENTER, 0, 0);
+            toast.show();
+            return; // 直接return
+        }
+
         boolean oldVisible = isVisible();
         if (isVisible) {
             show();
@@ -77,6 +90,7 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.player_click_retry) { // 播放
+            Recorder.get().allowMobileTraffic(Extra.getExtraUrl(getPlayerView()));
             SimpleExoPlayer player = getPlayer();
             if (player != null) {
                 player.setPlayWhenReady(true);

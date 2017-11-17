@@ -22,7 +22,7 @@ import com.aliya.player.PlayerListener;
 import com.aliya.player.R;
 import com.aliya.player.lifecycle.LifecycleUtils;
 import com.aliya.player.ui.widget.AspectRatioFrameLayout;
-import com.aliya.player.utils.ProgressCache;
+import com.aliya.player.utils.Recorder;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -136,8 +136,8 @@ public class PlayerView extends FrameLayout {
         // 4. 开始播放.
         player.setPlayWhenReady(true);
 
-        int progress = ProgressCache.get().getCacheProgress(url);
-        if (progress != ProgressCache.NO_VALUE && progress > 0) {
+        int progress = Recorder.get().getCacheProgress(url);
+        if (progress != Recorder.NO_VALUE && progress > 0) {
             player.seekTo(progress);
         }
     }

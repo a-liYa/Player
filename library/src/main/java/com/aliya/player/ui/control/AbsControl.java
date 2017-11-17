@@ -1,5 +1,7 @@
 package com.aliya.player.ui.control;
 
+import android.content.Context;
+
 import com.aliya.player.Control;
 import com.aliya.player.ui.Controller;
 import com.aliya.player.ui.PlayerView;
@@ -39,4 +41,10 @@ abstract class AbsControl implements Control {
     public void setVisibilityListener(VisibilityListener visibilityListener) {
         this.visibilityListener = visibilityListener;
     }
+
+    @Override
+    public Context getContext(){
+        return controller != null ? controller.getContext() : null;
+    }
+
 }

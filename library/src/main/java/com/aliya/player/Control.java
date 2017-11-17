@@ -1,5 +1,6 @@
 package com.aliya.player;
 
+import android.content.Context;
 import android.view.View;
 
 import com.aliya.player.ui.PlayerView;
@@ -22,6 +23,8 @@ public interface Control {
     SimpleExoPlayer getPlayer();
 
     PlayerView getPlayerView();
+
+    Context getContext();
 
     void setVisibilityListener(VisibilityListener visibilityListener);
 

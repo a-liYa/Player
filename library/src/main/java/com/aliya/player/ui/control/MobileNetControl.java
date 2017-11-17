@@ -1,5 +1,6 @@
 package com.aliya.player.ui.control;
 
+import android.content.Context;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewStub;
@@ -43,10 +44,13 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
     public void setVisibility(boolean isVisible) {
         // 以及阻塞提醒，直接toast提醒就行
         if (isVisible && Recorder.get().isAllowMobileTraffic(Extra.getExtraUrl(getPlayerView()))) {
-            Toast toast = Toast.makeText(getPlayerView().getContext(), R.string
-                    .player_mobile_traffic_alert, Toast.LENGTH_SHORT);
-            toast.setGravity(Gravity.CENTER, 0, 0);
-            toast.show();
+            Context context = getContext();
+            if (context != null) {
+                Toast toast = Toast.makeText(context, R.string.player_mobile_traffic_alert,
+                        Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            }
             return; // 直接return
         }
 

@@ -29,7 +29,6 @@ public class PlayerManager {
 
     private GroupListener mGroupListener;
 
-
     private volatile static SoftReference<PlayerManager> sSoftInstance;
 
     private PlayerManager() {
@@ -52,10 +51,18 @@ public class PlayerManager {
     }
 
     public void play(FrameLayout parent, String url) {
-        play(parent, url, -1);
+        play(parent, url, null);
+    }
+
+    public void play(FrameLayout parent, String url, Object extraData) {
+        play(parent, url, -1, extraData);
     }
 
     public void play(FrameLayout parent, String url, int childIndex) {
+        play(parent, url, childIndex, null);
+    }
+
+    public void play(FrameLayout parent, String url, int childIndex, Object extraData) {
         if (TextUtils.isEmpty(url) || parent == null) return;
         mHelper.setContext(parent.getContext());
 
@@ -79,8 +86,12 @@ public class PlayerManager {
                 parent.addView(mSmoothPlayerView, childIndex, mPlayerLayoutParams);
             }
             mSmoothPlayerView.post(smoothSwitchRunnable);
-            Extra.setExtra(mSmoothPlayerView, url, null);
+            if (extraData == null) { // 取复用View的数据
+                extraData = Extra.getExtraData(mPlayerView);
+            }
+            Extra.setExtra(mSmoothPlayerView, url, extraData);
 
+            setPlayerCallback(parent, getPlayerCallback((View) mPlayerView.getParent()));
         } else { // 不同url
 
             if (mPlayerView == null) {
@@ -111,7 +122,7 @@ public class PlayerManager {
             mBackupUrl = url;
             mPlayerView.play(url);
 
-            Extra.setExtra(mPlayerView, url, null);
+            Extra.setExtra(mPlayerView, url, extraData);
         }
 
     }
@@ -164,7 +175,20 @@ public class PlayerManager {
         }
     }
 
-    public static void setPlayerListenerByView(View parent, PlayerListener listener) {
+    public static void setPlayerCallback(View parent, PlayerCallback callback) {
+        if (parent != null) {
+            parent.setTag(R.id.player_tag_callback, callback);
+        }
+    }
+
+    public static PlayerCallback getPlayerCallback(View parent) {
+        if (parent != null) {
+            return (PlayerCallback) parent.getTag(R.id.player_tag_callback);
+        }
+        return null;
+    }
+
+    static void setPlayerListenerByView(View parent, PlayerListener listener) {
         if (parent != null) {
             parent.setTag(R.id.player_tag_listener, listener);
         }

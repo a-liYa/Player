@@ -6,13 +6,14 @@ import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.aliya.player.PlayerCallback;
+import com.aliya.player.PlayerManager;
 import com.aliya.player.R;
 import com.aliya.player.ui.Controller;
 import com.aliya.player.ui.PlayerView;
 import com.aliya.player.utils.Utils;
 import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.Player;
-import com.google.android.exoplayer2.SimpleExoPlayer;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;
@@ -199,10 +200,24 @@ public class NavBarControl extends AbsControl {
             final Player player = getPlayer();
             if (player != null) {
                 if (v.getId() == R.id.player_play_pause) {
-                    player.setPlayWhenReady(!player.getPlayWhenReady());
+                    boolean playWhenReady = player.getPlayWhenReady();
+                    player.setPlayWhenReady(!playWhenReady);
+
+                    PlayerCallback callback = PlayerManager.getPlayerCallback(getParentView());
+                    if (callback != null) {
+                        if (playWhenReady) { // true -> false
+                            callback.onPause(getPlayerView());
+                        } else { // false -> true
+                            callback.onPlay(getPlayerView());
+                        }
+                    }
                 } else if (v.getId() == R.id.player_full_screen) {
                     PlayerView playerView = getPlayerView();
                     if (playerView != null) {
+                        PlayerCallback callback = PlayerManager.getPlayerCallback(getParentView());
+                        if (callback != null) {
+                            callback.onFullscreenChange(!playerView.isFullscreen(), playerView);
+                        }
                         playerView.switchFullScreen();
                     }
                 }

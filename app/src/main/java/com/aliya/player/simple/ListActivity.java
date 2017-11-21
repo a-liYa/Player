@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,10 @@ import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.aliya.player.Extra;
+import com.aliya.player.PlayerCallback;
 import com.aliya.player.PlayerManager;
+import com.aliya.player.ui.PlayerView;
 
 import java.util.Arrays;
 import java.util.List;
@@ -95,7 +99,28 @@ public class ListActivity extends AppCompatActivity {
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.iv_play_start:
-                    PlayerManager.get().play(mParentPlayer, mData);
+                    PlayerManager.get().play(mParentPlayer, mData, new String("position " + getAdapterPosition()));
+                    PlayerManager.setPlayerCallback(mParentPlayer, new PlayerCallback() {
+                        @Override
+                        public void onPause(PlayerView view) {
+                            Log.e("TAG", "onPause " + Extra.getExtraData(view));
+                        }
+
+                        @Override
+                        public void onPlay(PlayerView view) {
+                            Log.e("TAG", "onPlay " + Extra.getExtraData(view));
+                        }
+
+                        @Override
+                        public void onFullscreenChange(boolean isFullscreen, PlayerView view) {
+                            Log.e("TAG", "onFullscreenChange " + isFullscreen + " - " + Extra.getExtraData(view));
+                        }
+
+                        @Override
+                        public void onMuteChange(boolean isMute, PlayerView view) {
+                            Log.e("TAG", "onMuteChange " + isMute + " - " + Extra.getExtraData(view));
+                        }
+                    });
                     break;
                 case R.id.ll_info:
 

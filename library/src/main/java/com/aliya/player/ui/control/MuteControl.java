@@ -3,6 +3,8 @@ package com.aliya.player.ui.control;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.aliya.player.PlayerCallback;
+import com.aliya.player.PlayerManager;
 import com.aliya.player.R;
 import com.aliya.player.ui.Controller;
 
@@ -49,6 +51,10 @@ public class MuteControl extends AbsControl implements View.OnClickListener {
             if (getPlayer() != null) {
                 isMute = !isMute;
                 updateVolume();
+                PlayerCallback callback = PlayerManager.getPlayerCallback(getParentView());
+                if (callback != null) {
+                    callback.onMuteChange(isMute, getPlayerView());
+                }
             }
         }
     }

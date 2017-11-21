@@ -24,6 +24,8 @@ public interface Control {
 
     PlayerView getPlayerView();
 
+    View getParentView();
+
     Context getContext();
 
     void setVisibilityListener(VisibilityListener visibilityListener);

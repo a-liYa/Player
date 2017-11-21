@@ -1,6 +1,7 @@
 package com.aliya.player.ui.control;
 
 import android.content.Context;
+import android.view.View;
 
 import com.aliya.player.Control;
 import com.aliya.player.ui.Controller;
@@ -30,6 +31,15 @@ abstract class AbsControl implements Control {
     @Override
     public PlayerView getPlayerView() {
         return controller != null ? controller.getPlayerView() : null;
+    }
+
+    @Override
+    public View getParentView() {
+        PlayerView playerView = getPlayerView();
+        if (playerView != null) {
+            return (View) playerView.getParent();
+        }
+        return null;
     }
 
     @Override

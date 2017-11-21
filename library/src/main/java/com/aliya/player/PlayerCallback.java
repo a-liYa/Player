@@ -36,7 +36,7 @@ public interface PlayerCallback {
      * 静音／取消静音 call back
      *
      * @param isMute true : 设置静音; false : 取消静音
-     * @param view
+     * @param view   current player view
      */
     void onMuteChange(boolean isMute, PlayerView view);
 

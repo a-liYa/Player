@@ -223,6 +223,8 @@ public class Controller {
 
         updateIcFullscreen();
 
+        networkType = synced.networkType;
+
     }
 
     public void updateIcFullscreen() {
@@ -253,8 +255,8 @@ public class Controller {
                     getContext().unregisterReceiver(netStateReceiver);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
             }
+            networkType = -1;
         }
     }
 
@@ -397,6 +399,8 @@ public class Controller {
         }
     }
 
+    private int networkType = -1;
+
     /**
      * 网络状态的变化监听
      */
@@ -404,20 +408,19 @@ public class Controller {
 
         @Override
         public void onReceive(Context context, Intent intent) {
-
             switch (intent.getAction()) {
                 case ConnectivityManager.CONNECTIVITY_ACTION:
-                    if (intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, -1)
-                            == ConnectivityManager.TYPE_MOBILE) {
+                    int type = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, -1);
+                    if (type == ConnectivityManager.TYPE_MOBILE && type != networkType) {
                         // 移动网络有变化，切走或切回
-                        if (Utils.isMobile(context)) { // 切换到移动网络
+                        if (Utils.isMobile(context) ) { // 切换到移动网络
                             showMobileNetwork();
                         }
                     }
+                    networkType = type;
                     break;
             }
         }
-
     }
 
 }

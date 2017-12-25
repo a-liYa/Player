@@ -37,6 +37,9 @@ public class Recorder {
         }
     }
 
+    /**
+     * 缓存视频进度
+     */
     private LruCache<String, Long> lruProgress; // 最近最少（Least Recently Used）
 
     public void putCacheProgress(String key, long position) {
@@ -59,6 +62,9 @@ public class Recorder {
         return NO_VALUE;
     }
 
+    /**
+     * 缓存允许移动流量播放
+     */
     private LruCache<String, Boolean> lruAllow;
 
     /**

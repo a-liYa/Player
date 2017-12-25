@@ -42,7 +42,7 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
 
     @Override
     public void setVisibility(boolean isVisible) {
-        // 以及阻塞提醒，直接toast提醒就行
+        // 已阻塞提醒过，直接toast提醒就行
         if (isVisible && Recorder.get().isAllowMobileTraffic(Extra.getExtraUrl(getPlayerView()))) {
             Context context = getContext();
             if (context != null) {

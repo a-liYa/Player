@@ -1,14 +1,12 @@
 package com.aliya.player;
 
-import android.view.View;
-
 /**
  * player listener
  *
  * @author a_liYa
  * @date 2017/8/16 09:56.
  */
-public interface PlayerListener extends View.OnAttachStateChangeListener {
+public interface PlayerListener {
 
     /**
      * 全屏切换 callback

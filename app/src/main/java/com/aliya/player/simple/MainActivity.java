@@ -30,20 +30,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         findViewById(R.id.btn_single).setOnClickListener(this);
         findViewById(R.id.btn_list).setOnClickListener(this);
 
-        mOrientationHelper = new OrientationHelper();
+//        mOrientationHelper = new OrientationHelper();
 
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        mOrientationHelper.unregisterListener(this);
+//        mOrientationHelper.unregisterListener(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mOrientationHelper.registerListener(this, this);
+//        mOrientationHelper.registerListener(this, this);
     }
 
     @Override

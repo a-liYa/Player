@@ -1,11 +1,15 @@
 package com.aliya.player;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -22,8 +26,11 @@ public class FullscreenActivity extends Activity {
     private String url;
     private PlayerManager playerManager;
     private Listeners listeners = new Listeners();
+    private OrientationBroadcastReceiver mBroadcastReceiver;
 
     public static final String KEY_URL = "key_url";
+    public static final String KEY_ORIENTATION = "key_orientation";
+    public static final String ACTION_ORIENTATION = "com.aliya.action.ORIENTATION_CHANGE";
 
     public static void startActivity(Context context, String url) {
         Intent intent = new Intent(context, FullscreenActivity.class);
@@ -37,6 +44,10 @@ public class FullscreenActivity extends Activity {
         // 设置全屏
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        playerManager = PlayerManager.get();
+        if (playerManager.getOrientationHelper().isShouldReverseLandscape()) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
+        }
         super.onCreate(savedInstanceState);
         setContentView(R.layout.module_palyer_activity_fullscreen);
 
@@ -53,10 +64,25 @@ public class FullscreenActivity extends Activity {
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
-        playerManager = PlayerManager.get();
+
         playerManager.play(frameContainer, url);
         PlayerManager.setPlayerOnAttachStateChangeListener(frameContainer, listeners);
 
+        mBroadcastReceiver = new OrientationBroadcastReceiver();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ACTION_ORIENTATION);
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, filter);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
     }
 
     private void initUrl(Bundle intent) {
@@ -114,5 +140,16 @@ public class FullscreenActivity extends Activity {
         }
     }
 
+    class OrientationBroadcastReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int orientation = intent.getIntExtra(KEY_ORIENTATION, -1);
+            if (orientation != -1) {
+                FullscreenActivity.this.setRequestedOrientation(orientation);
+            }
+        }
+
+    }
 
 }

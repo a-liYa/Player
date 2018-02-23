@@ -5,8 +5,8 @@ import android.content.pm.ActivityInfo;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * 屏幕感应方向 助手类
@@ -22,12 +22,9 @@ public class OrientationHelper {
     private int mScreenOrientation;
     private List<OrientationListener> mListeners;
 
-    public OrientationHelper() {
-    }
-
     public void registerListener(Context context, OrientationListener listener) {
         if (mListeners == null) {
-            mListeners = new ArrayList<>();
+            mListeners = new CopyOnWriteArrayList<>();
         }
         boolean empty = mListeners.isEmpty();
         mListeners.add(listener);
@@ -67,6 +64,33 @@ public class OrientationHelper {
      */
     public int getShouldScreenOrientation() {
         return mScreenOrientation;
+    }
+
+    /**
+     * 应该是横屏翻转
+     *
+     * @return true 是
+     */
+    public boolean isShouldReverseLandscape() {
+        return mScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE;
+    }
+
+    /**
+     * 应该是横屏
+     *
+     * @return true 是
+     */
+    public boolean isShouldLandscape() {
+        return mScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+    }
+
+    /**
+     * 应该是竖屏
+     *
+     * @return true 是
+     */
+    public boolean isShouldPortrait() {
+        return mScreenOrientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
     }
 
     class OrientationAngleChangeListener implements GravitySensorListener

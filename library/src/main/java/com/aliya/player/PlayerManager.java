@@ -1,11 +1,17 @@
 package com.aliya.player;
 
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.provider.Settings;
+import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 
+import com.aliya.player.gravity.OrientationHelper;
+import com.aliya.player.gravity.OrientationListener;
 import com.aliya.player.ui.PlayerView;
 
 import java.lang.ref.SoftReference;
@@ -26,6 +32,7 @@ public class PlayerManager {
 
     private String mBackupUrl;
     private PlayerHelper mHelper;
+    private OrientationHelper mOrientationHelper;
 
     private GroupListener mGroupListener;
 
@@ -33,6 +40,7 @@ public class PlayerManager {
 
     private PlayerManager() {
         mHelper = new PlayerHelper();
+        mOrientationHelper = new OrientationHelper();
         mPlayerLayoutParams = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
         mGroupListener = new GroupListener();
 
@@ -77,12 +85,9 @@ public class PlayerManager {
             mSmoothPlayerView.removeOnAttachStateChangeListener(mGroupListener);
             mSmoothPlayerView.addOnAttachStateChangeListener(mGroupListener);
 
-            if (childIndex < 0) {
+            if (childIndex < 0 || childIndex > parent.getChildCount()) { // 在最后一个位置插入
                 parent.addView(mSmoothPlayerView, mPlayerLayoutParams);
             } else {
-                if (childIndex > parent.getChildCount()) {
-                    childIndex = parent.getChildCount();
-                }
                 parent.addView(mSmoothPlayerView, childIndex, mPlayerLayoutParams);
             }
             mSmoothPlayerView.post(smoothSwitchRunnable);
@@ -93,7 +98,6 @@ public class PlayerManager {
 
             setPlayerCallback(parent, getPlayerCallback((View) mPlayerView.getParent()));
         } else { // 不同url
-
             if (mPlayerView == null) {
                 mPlayerView = new PlayerView(mHelper.getContext());
                 mPlayerView.setPlayerHelper(mHelper);
@@ -129,6 +133,10 @@ public class PlayerManager {
 
     public PlayerView getPlayerView() {
         return mPlayerView;
+    }
+
+    public OrientationHelper getOrientationHelper() {
+        return mOrientationHelper;
     }
 
     private Runnable smoothSwitchRunnable = new Runnable() {
@@ -207,7 +215,8 @@ public class PlayerManager {
         }
     }
 
-    private final class GroupListener implements View.OnAttachStateChangeListener {
+    private final class GroupListener implements View.OnAttachStateChangeListener,
+            OrientationListener {
 
         @Override
         public void onViewAttachedToWindow(View v) {
@@ -223,6 +232,8 @@ public class PlayerManager {
                 if (tag instanceof View.OnAttachStateChangeListener) {
                     ((View.OnAttachStateChangeListener) tag).onViewAttachedToWindow(v);
                 }
+
+                mOrientationHelper.registerListener(v.getContext(), this);
             }
         }
 
@@ -246,6 +257,52 @@ public class PlayerManager {
                 Object tag = ((ViewGroup) v.getParent()).getTag(R.id.player_tag_attach_listener);
                 if (tag instanceof View.OnAttachStateChangeListener) {
                     ((View.OnAttachStateChangeListener) tag).onViewDetachedFromWindow(v);
+                }
+
+                mOrientationHelper.unregisterListener(this);
+            }
+        }
+
+        private int screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+
+        @Override
+        public void onOrientation(int orientation) {
+            if (screenOrientation != orientation) {
+                try {
+                    // 系统自动旋转是否关闭
+                    if (0 == Settings.System.getInt(
+                            mHelper.getContext().getContentResolver(),
+                            Settings.System.ACCELEROMETER_ROTATION)) {
+                        return;
+                    }
+                } catch (Settings.SettingNotFoundException e) {
+                    // no-op
+                }
+
+                if (orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
+                    // 竖屏翻转 no-op
+                } else {
+                    screenOrientation = orientation;
+                    if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                            || orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
+                        // 横屏 | 横屏翻转
+                        if (mPlayerView != null) {
+                            if (mPlayerView.isFullscreen()) {
+                                Intent intent = new Intent();
+                                intent.setAction(FullscreenActivity.ACTION_ORIENTATION);
+                                intent.putExtra(FullscreenActivity.KEY_ORIENTATION, orientation);
+                                LocalBroadcastManager
+                                        .getInstance(mHelper.getContext()).sendBroadcast(intent);
+                            } else {
+                                mPlayerView.startFullScreen();
+                            }
+                        }
+                    } else if (orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+                        // 竖屏
+                        if (mPlayerView != null) {
+                            mPlayerView.exitFullscreen();
+                        }
+                    }
                 }
             }
         }

@@ -2,6 +2,7 @@ package com.aliya.player;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
@@ -90,7 +91,7 @@ public class PlayerManager {
             } else {
                 parent.addView(mSmoothPlayerView, childIndex, mPlayerLayoutParams);
             }
-            mSmoothPlayerView.post(smoothSwitchRunnable);
+            mSmoothPlayerView.post(mSmoothSwitchRunnable);
             if (extraData == null) { // 取复用View的数据
                 extraData = Extra.getExtraData(mPlayerView);
             }
@@ -139,7 +140,7 @@ public class PlayerManager {
         return mOrientationHelper;
     }
 
-    private Runnable smoothSwitchRunnable = new Runnable() {
+    private Runnable mSmoothSwitchRunnable = new Runnable() {
         @Override
         public void run() {
             smoothSwitchView();
@@ -218,6 +219,9 @@ public class PlayerManager {
     private final class GroupListener implements View.OnAttachStateChangeListener,
             OrientationListener {
 
+        private int screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
+        private long timeMillis;
+
         @Override
         public void onViewAttachedToWindow(View v) {
             if (v.getId() == R.id.player_view) {
@@ -263,13 +267,11 @@ public class PlayerManager {
             }
         }
 
-        private int screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
-
         @Override
         public void onOrientation(int orientation) {
             if (screenOrientation != orientation) {
                 try {
-                    // 系统自动旋转是否关闭
+                    // 系统自动旋转关闭，屏幕不跟随重力感应
                     if (0 == Settings.System.getInt(
                             mHelper.getContext().getContentResolver(),
                             Settings.System.ACCELEROMETER_ROTATION)) {
@@ -282,6 +284,9 @@ public class PlayerManager {
                 if (orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {
                     // 竖屏翻转 no-op
                 } else {
+                    if (SystemClock.uptimeMillis() - timeMillis < 1000) {
+                        return; // 切换时间间隔太短
+                    }
                     screenOrientation = orientation;
                     if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                             || orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
@@ -300,11 +305,30 @@ public class PlayerManager {
                     } else if (orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
                         // 竖屏
                         if (mPlayerView != null) {
+                            if (mSmoothPlayerView != null) {
+                                mSmoothPlayerView.removeCallbacks(mSmoothSwitchRunnable);
+                            }
                             mPlayerView.exitFullscreen();
                         }
                     }
+                    timeMillis = SystemClock.uptimeMillis();
                 }
             }
+        }
+
+        private String toText(int orientation) {
+            switch (orientation) {
+                case ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE:
+                    return "横屏翻转";
+                case ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT:
+                    return "竖屏翻转";
+                case ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE:
+                    return "横屏";
+                case ActivityInfo.SCREEN_ORIENTATION_PORTRAIT:
+                    return "竖屏";
+
+            }
+            return "未知";
         }
 
     }

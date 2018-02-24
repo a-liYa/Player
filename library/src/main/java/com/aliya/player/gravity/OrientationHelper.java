@@ -32,7 +32,7 @@ public class OrientationHelper {
             sm = (SensorManager) context.getSystemService(Context.SENSOR_SERVICE);
             mSensorListener = new GravitySensorListener(new OrientationAngleChangeListener());
             sm.registerListener(mSensorListener, sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
-                    SensorManager.SENSOR_DELAY_UI);
+                    SensorManager.SENSOR_DELAY_NORMAL);
         }
     }
 

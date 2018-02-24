@@ -10,6 +10,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -45,6 +46,7 @@ public class FullscreenActivity extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         playerManager = PlayerManager.get();
+        // 设置屏幕取向
         if (playerManager.getOrientationHelper().isShouldReverseLandscape()) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE);
         }
@@ -69,6 +71,13 @@ public class FullscreenActivity extends Activity {
         PlayerManager.setPlayerOnAttachStateChangeListener(frameContainer, listeners);
 
         mBroadcastReceiver = new OrientationBroadcastReceiver();
+        Log.e("TAG", "onCreate ");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.e("TAG", "onDestroy ");
     }
 
     @Override

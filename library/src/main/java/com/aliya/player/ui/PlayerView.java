@@ -302,6 +302,7 @@ public class PlayerView extends FrameLayout {
             if (getParent() instanceof ViewGroup) {
                 ((ViewGroup) getParent()).removeView(this);
                 backup.addView(this, MATCH_PARENT, MATCH_PARENT);
+
             }
         }
         backupParentSoft = null;

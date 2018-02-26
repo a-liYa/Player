@@ -270,6 +270,9 @@ public class PlayerManager {
         @Override
         public void onOrientation(int orientation) {
             if (screenOrientation != orientation) {
+                if (mPlayerView == null || mPlayerView.isStop()) {
+                    return;
+                }
                 try {
                     // 系统自动旋转关闭，屏幕不跟随重力感应
                     if (0 == Settings.System.getInt(
@@ -291,25 +294,21 @@ public class PlayerManager {
                     if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
                             || orientation == ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE) {
                         // 横屏 | 横屏翻转
-                        if (mPlayerView != null) {
-                            if (mPlayerView.isFullscreen()) {
-                                Intent intent = new Intent();
-                                intent.setAction(FullscreenActivity.ACTION_ORIENTATION);
-                                intent.putExtra(FullscreenActivity.KEY_ORIENTATION, orientation);
-                                LocalBroadcastManager
-                                        .getInstance(mHelper.getContext()).sendBroadcast(intent);
-                            } else {
-                                mPlayerView.startFullScreen();
-                            }
+                        if (mPlayerView.isFullscreen()) {
+                            Intent intent = new Intent();
+                            intent.setAction(FullscreenActivity.ACTION_ORIENTATION);
+                            intent.putExtra(FullscreenActivity.KEY_ORIENTATION, orientation);
+                            LocalBroadcastManager
+                                    .getInstance(mHelper.getContext()).sendBroadcast(intent);
+                        } else {
+                            mPlayerView.startFullScreen();
                         }
                     } else if (orientation == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
                         // 竖屏
-                        if (mPlayerView != null) {
-                            if (mSmoothPlayerView != null) {
-                                mSmoothPlayerView.removeCallbacks(mSmoothSwitchRunnable);
-                            }
-                            mPlayerView.exitFullscreen();
+                        if (mSmoothPlayerView != null) {
+                            mSmoothPlayerView.removeCallbacks(mSmoothSwitchRunnable);
                         }
+                        mPlayerView.exitFullscreen();
                     }
                     timeMillis = SystemClock.uptimeMillis();
                 }

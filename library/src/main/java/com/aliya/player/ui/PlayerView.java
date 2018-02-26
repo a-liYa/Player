@@ -218,21 +218,21 @@ public class PlayerView extends FrameLayout {
 
     private class ReleaseRunnable implements Runnable {
 
-        private SimpleExoPlayer player;
+        private SimpleExoPlayer mInnerPlayer;
 
         public ReleaseRunnable(SimpleExoPlayer player) {
-            this.player = player;
+            this.mInnerPlayer = player;
         }
 
         @Override
         public void run() {
-            if (player != null) {
+            if (mInnerPlayer != null) {
                 try {
-                    player.release();
+                    mInnerPlayer.release();
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                player = null;
+                mInnerPlayer = null;
             }
         }
     }

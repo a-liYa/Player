@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.LocalBroadcastManager;
-import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
@@ -71,13 +70,11 @@ public class FullscreenActivity extends Activity {
         PlayerManager.setPlayerOnAttachStateChangeListener(frameContainer, listeners);
 
         mBroadcastReceiver = new OrientationBroadcastReceiver();
-        Log.e("TAG", "onCreate ");
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Log.e("TAG", "onDestroy ");
     }
 
     @Override

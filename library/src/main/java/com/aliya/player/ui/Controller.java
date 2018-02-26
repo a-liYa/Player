@@ -222,6 +222,7 @@ public class Controller {
         updateProgressAction.run();
 
         updateIcFullscreen();
+        updateControlClickSwitch();
 
         networkType = synced.networkType;
 

@@ -1,6 +1,7 @@
 package com.aliya.player.ui.control;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewStub;
@@ -71,7 +72,9 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
     }
 
     public void setTextHint(int stringId) {
-        tvHint.setText(stringId);
+        if (tvHint != null) {
+            tvHint.setText(stringId);
+        }
     }
 
     private void show() {
@@ -102,7 +105,11 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.player_click_retry) { // 播放
-            Recorder.get().allowMobileTraffic(Extra.getExtraUrl(getPlayerView()));
+            if (tvHint != null && TextUtils.equals(
+                    getContext().getString(R.string.player_hint_mobile_network),
+                    tvHint.getText())) {
+                Recorder.get().allowMobileTraffic(Extra.getExtraUrl(getPlayerView()));
+            }
             SimpleExoPlayer player = getPlayer();
             if (player != null) {
                 player.setPlayWhenReady(true);

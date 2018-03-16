@@ -288,7 +288,7 @@ public class PlayerManager {
                     // 竖屏翻转 no-op
                 } else {
                     if (SystemClock.uptimeMillis() - timeMillis < 1000) {
-                        return; // 切换时间间隔太短
+                        return; // 自动切换时间间隔太短
                     }
                     screenOrientation = orientation;
                     if (orientation == ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE

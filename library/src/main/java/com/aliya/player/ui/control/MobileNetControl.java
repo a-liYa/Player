@@ -4,6 +4,7 @@ import android.content.Context;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewStub;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aliya.player.Extra;
@@ -22,6 +23,8 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
 
     private ViewStub viewStub;
     private View rootView;
+
+    private TextView tvHint;
 
     public MobileNetControl(Controller controller) {
         super(controller);
@@ -67,6 +70,10 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
         }
     }
 
+    public void setTextHint(int stringId) {
+        tvHint.setText(stringId);
+    }
+
     private void show() {
         if (rootView == null) {
             if (viewStub != null) {
@@ -74,6 +81,7 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
                 viewStub = null;
                 View view = rootView.findViewById(R.id.player_click_retry);
                 view.setOnClickListener(this);
+                tvHint = (TextView) rootView.findViewById(R.id.player_tv_hint);
             }
         }
         if (rootView != null) {

@@ -270,7 +270,18 @@ public class Controller {
 
     private void showMobileNetwork() {
         if (mobileControl != null) {
-            mobileControl.setVisibility(true);
+            if (!mobileControl.isVisible()) {
+                mobileControl.setVisibility(true);
+            }
+            mobileControl.setTextHint(R.string.player_hint_mobile_network);
+        }
+    }
+
+    private void showWiFiNetwork() {
+        if (mobileControl != null) {
+            if (mobileControl.isVisible()) {
+                mobileControl.setTextHint(R.string.player_hint_wifi_network);
+            }
         }
     }
 
@@ -412,10 +423,16 @@ public class Controller {
             switch (intent.getAction()) {
                 case ConnectivityManager.CONNECTIVITY_ACTION:
                     int type = intent.getIntExtra(ConnectivityManager.EXTRA_NETWORK_TYPE, -1);
-                    if (type == ConnectivityManager.TYPE_MOBILE && type != networkType) {
-                        // 移动网络有变化，切走或切回
-                        if (Utils.isMobile(context) ) { // 切换到移动网络
-                            showMobileNetwork();
+                    if (type != networkType) {
+                        if (type == ConnectivityManager.TYPE_MOBILE) {
+                            // 移动网络有变化，切走或切回
+                            if (Utils.isMobile(context) ) { // 切换到移动网络
+                                showMobileNetwork();
+                            }
+                        } else if (type == ConnectivityManager.TYPE_WIFI) {
+                            if (Utils.isWifi(context)) {
+                                showWiFiNetwork();
+                            }
                         }
                     }
                     networkType = type;

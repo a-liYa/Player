@@ -111,4 +111,15 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
         }
     }
 
+    public void syncRegime(MobileNetControl control) {
+        if (control == null) return;
+        if (control.isVisible()) {
+            show();
+            if (tvHint != null && control.tvHint != null) {
+                tvHint.setText(control.tvHint.getText());
+            }
+        } else {
+            hide();
+        }
+    }
 }

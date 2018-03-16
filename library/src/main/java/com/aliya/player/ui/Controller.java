@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.support.annotation.LayoutRes;
+import android.util.Log;
 import android.view.View;
 
 import com.aliya.player.Control;
@@ -219,6 +220,10 @@ public class Controller {
             errorControl.setVisibility(synced.errorControl.isVisible());
         }
 
+        if (mobileControl != null) {
+            mobileControl.syncRegime(synced.mobileControl);
+        }
+
         updateProgressAction.run();
 
         updateIcFullscreen();
@@ -292,7 +297,9 @@ public class Controller {
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             if (playbackState == Player.STATE_BUFFERING) { // 缓冲
                 stopUpdateProgress();
-                bufferControl.setVisibility(true);
+                if (!mobileControl.isVisible()) {
+                    bufferControl.setVisibility(true);
+                }
             } else if (playbackState == Player.STATE_READY) { // 播放
                 updateProgressAction.run();
                 bufferControl.setVisibility(false);
@@ -426,7 +433,7 @@ public class Controller {
                     if (type != networkType) {
                         if (type == ConnectivityManager.TYPE_MOBILE) {
                             // 移动网络有变化，切走或切回
-                            if (Utils.isMobile(context) ) { // 切换到移动网络
+                            if (Utils.isMobile(context)) { // 切换到移动网络
                                 showMobileNetwork();
                             }
                         } else if (type == ConnectivityManager.TYPE_WIFI) {

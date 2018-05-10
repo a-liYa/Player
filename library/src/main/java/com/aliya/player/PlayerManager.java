@@ -2,6 +2,7 @@ package com.aliya.player;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.media.AudioManager;
 import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
@@ -80,6 +81,7 @@ public class PlayerManager {
             if (mSmoothPlayerView == null) {
                 mSmoothPlayerView = new PlayerView(mHelper.getContext());
                 mSmoothPlayerView.setPlayerHelper(mHelper);
+                mSmoothPlayerView.setOnAudioFocusChangeListener(mGroupListener);
                 mSmoothPlayerView.setId(R.id.player_view);
             }
 
@@ -102,6 +104,7 @@ public class PlayerManager {
             if (mPlayerView == null) {
                 mPlayerView = new PlayerView(mHelper.getContext());
                 mPlayerView.setPlayerHelper(mHelper);
+                mPlayerView.setOnAudioFocusChangeListener(mGroupListener);
                 mPlayerView.setId(R.id.player_view);
             }
 
@@ -217,7 +220,7 @@ public class PlayerManager {
     }
 
     private final class GroupListener implements View.OnAttachStateChangeListener,
-            OrientationListener {
+            OrientationListener, AudioManager.OnAudioFocusChangeListener {
 
         private int screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
         private long timeMillis;
@@ -312,6 +315,27 @@ public class PlayerManager {
                     }
                     timeMillis = SystemClock.uptimeMillis();
                 }
+            }
+        }
+
+        @Override
+        public void onAudioFocusChange(int focusChange) {
+            switch (focusChange) {
+                // 音频焦点
+                case AudioManager.AUDIOFOCUS_LOSS: // 其他App请求焦点，未知时长
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT: // 其他App请求焦点，临时的
+                    if (mPlayerView != null) {
+                        mPlayerView.pause();
+                    }
+                    break;
+                case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK: // 其他App请求焦点，临时的，可降低音量不用停止
+                    break;
+                case AudioManager.AUDIOFOCUS_GAIN: // 其他App放弃未知时长焦点
+                    break;
+                case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT: // 其他App放弃临时焦点
+                    break;
+                case AudioManager.AUDIOFOCUS_GAIN_TRANSIENT_MAY_DUCK: // 其他App放弃临时焦点
+                    break;
             }
         }
 

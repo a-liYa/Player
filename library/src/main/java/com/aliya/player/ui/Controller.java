@@ -302,6 +302,9 @@ public class Controller {
             } else if (playbackState == Player.STATE_READY) { // 播放
                 updateProgressAction.run();
                 bufferControl.setVisibility(false);
+                if (playWhenReady) {
+                    playerView.requestAudioFocus();
+                }
             } else if (playbackState == Player.STATE_ENDED) { // 播完毕
                 if (playerView != null) {
                     playerView.stop();

@@ -2,6 +2,7 @@ package com.aliya.player.ui;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.media.AudioManager;
 import android.net.Uri;
 import android.support.annotation.AttrRes;
 import android.support.annotation.NonNull;
@@ -16,9 +17,11 @@ import android.view.ViewParent;
 import android.widget.FrameLayout;
 
 import com.aliya.player.FullscreenActivity;
+import com.aliya.player.PlayerCallback;
 import com.aliya.player.PlayerHelper;
 import com.aliya.player.PlayerLifecycleImpl;
 import com.aliya.player.PlayerListener;
+import com.aliya.player.PlayerManager;
 import com.aliya.player.R;
 import com.aliya.player.lifecycle.LifecycleUtils;
 import com.aliya.player.ui.widget.AspectRatioFrameLayout;
@@ -61,6 +64,7 @@ public class PlayerView extends FrameLayout {
     private ExecutorService service;
 
     public PlayerLifecycleImpl playerLifecycle;
+    private AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener;
 
     public PlayerView(@NonNull Context context) {
         this(context, null);
@@ -140,6 +144,17 @@ public class PlayerView extends FrameLayout {
         if (progress != Recorder.NO_VALUE && progress > 0) {
             player.seekTo(progress);
         }
+
+    }
+
+    /**
+     * 请求音频焦点
+     */
+    public void requestAudioFocus() {
+        AudioManager audioManager = (AudioManager)
+                getContext().getSystemService(Context.AUDIO_SERVICE);
+        audioManager.requestAudioFocus(mOnAudioFocusChangeListener, AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN_TRANSIENT);
     }
 
     public PlayerListener getPlayerListener() {
@@ -150,6 +165,15 @@ public class PlayerView extends FrameLayout {
             }
         }
         return null;
+    }
+
+    public void pause() {
+        if (player != null) {
+            player.setPlayWhenReady(false);
+            PlayerCallback callback = PlayerManager.getPlayerCallback((View) getParent());
+            if (callback != null)
+                callback.onPause(this);
+        }
     }
 
     public String getUrl() {
@@ -209,11 +233,19 @@ public class PlayerView extends FrameLayout {
             service.execute(new ReleaseRunnable(player));
 
             player = null;
+
+            AudioManager audioManager = (AudioManager)
+                    getContext().getSystemService(Context.AUDIO_SERVICE);
+            audioManager.abandonAudioFocus(mOnAudioFocusChangeListener);
         }
     }
 
     public boolean isStop() {
         return player == null;
+    }
+
+    public void setOnAudioFocusChangeListener(AudioManager.OnAudioFocusChangeListener listener) {
+        mOnAudioFocusChangeListener = listener;
     }
 
     private class ReleaseRunnable implements Runnable {

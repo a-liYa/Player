@@ -63,7 +63,9 @@ public class MuteControl extends AbsControl implements View.OnClickListener {
         if (getPlayer() != null) {
             getPlayer().setVolume(isMute ? 0f : 1f);
         }
-        iv.setImageResource(isMute ? R.mipmap.module_player_controls_ic_mute
-                : R.mipmap.module_player_controls_ic_volume);
+        if (iv != null) {
+            iv.setImageResource(isMute ? R.mipmap.module_player_controls_ic_mute
+                    : R.mipmap.module_player_controls_ic_volume);
+        }
     }
 }

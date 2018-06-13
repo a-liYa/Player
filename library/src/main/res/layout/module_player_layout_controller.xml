@@ -77,6 +77,7 @@
         android:scaleType="center"
         android:src="@mipmap/module_player_controls_ic_volume" />
 
+    <!--底部播放进度条-->
     <ProgressBar
         android:id="@id/player_bottom_progress_bar"
         style="@android:style/Widget.ProgressBar.Horizontal"
@@ -90,6 +91,7 @@
         android:minHeight="1dp"
         android:progressDrawable="@drawable/module_player_progress_bar_drawable" />
 
+    <!--中间缓冲圆形加载-->
     <ProgressBar
         android:id="@id/player_buffer_progress"
         style="?android:attr/progressBarStyleLarge"

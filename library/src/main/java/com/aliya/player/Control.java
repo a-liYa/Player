@@ -3,6 +3,7 @@ package com.aliya.player;
 import android.content.Context;
 import android.view.View;
 
+import com.aliya.player.ui.Controller;
 import com.aliya.player.ui.PlayerView;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 
@@ -20,6 +21,8 @@ public interface Control {
 
     void setVisibility(boolean isVisible);
 
+    void onControl(int action);
+
     SimpleExoPlayer getPlayer();
 
     PlayerView getPlayerView();
@@ -31,6 +34,8 @@ public interface Control {
     void setVisibilityListener(VisibilityListener visibilityListener);
 
     VisibilityListener getVisibilityListener();
+
+    void syncRegime(Control control);
 
     /**
      * Listener to be notified about changes of the visibility of the UI control.
@@ -45,6 +50,10 @@ public interface Control {
          */
         void onVisibilityChange(Control control, boolean isVisible);
 
+    }
+
+    interface Factory{
+        Control newControl(Controller controller);
     }
 
 }

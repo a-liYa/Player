@@ -8,6 +8,7 @@ import android.view.ViewStub;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aliya.player.Control;
 import com.aliya.player.Extra;
 import com.aliya.player.R;
 import com.aliya.player.ui.Controller;
@@ -71,9 +72,13 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
         }
     }
 
-    public void setTextHint(int stringId) {
-        if (tvHint != null) {
-            tvHint.setText(stringId);
+    @Override
+    public void onControl(int action) {
+        if (action == R.string.player_hint_mobile_network ||
+                action == R.string.player_hint_wifi_network) {
+            if (tvHint != null) {
+                tvHint.setText(action);
+            }
         }
     }
 
@@ -118,15 +123,18 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
         }
     }
 
-    public void syncRegime(MobileNetControl control) {
-        if (control == null) return;
-        if (control.isVisible()) {
-            show();
-            if (tvHint != null && control.tvHint != null) {
-                tvHint.setText(control.tvHint.getText());
+    @Override
+    public void syncRegime(Control control) {
+        if (control instanceof MobileNetControl) {
+            MobileNetControl mobileNetControl = (MobileNetControl) control;
+            if (control.isVisible()) {
+                show();
+                if (tvHint != null && mobileNetControl.tvHint != null) {
+                    tvHint.setText(mobileNetControl.tvHint.getText());
+                }
+            } else {
+                hide();
             }
-        } else {
-            hide();
         }
     }
 }

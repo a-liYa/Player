@@ -14,7 +14,7 @@ import com.google.android.exoplayer2.SimpleExoPlayer;
  * @author a_liYa
  * @date 2017/8/13 16:45.
  */
-abstract class AbsControl implements Control {
+public abstract class AbsControl implements Control {
 
     protected Controller controller;
     protected VisibilityListener visibilityListener;
@@ -31,6 +31,14 @@ abstract class AbsControl implements Control {
     @Override
     public PlayerView getPlayerView() {
         return controller != null ? controller.getPlayerView() : null;
+    }
+
+    @Override
+    public void onControl(int action) {
+    }
+
+    @Override
+    public void syncRegime(Control control) {
     }
 
     @Override

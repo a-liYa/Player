@@ -17,6 +17,8 @@ import com.aliya.player.gravity.OrientationListener;
 import com.aliya.player.ui.PlayerView;
 
 import java.lang.ref.SoftReference;
+import java.util.HashMap;
+import java.util.Map;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
 
@@ -46,6 +48,15 @@ public class PlayerManager {
         mPlayerLayoutParams = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
         mGroupListener = new GroupListener();
 
+    }
+
+    private static Map<Class<? extends Control>, Control.Factory> sFactoryMap = new HashMap();
+    public static void registerControl(Class<? extends Control> key, Control.Factory factory) {
+        sFactoryMap.put(key, factory);
+    }
+
+    public static Control.Factory getControlFactory(Class<? extends Control> key) {
+        return sFactoryMap.get(key);
     }
 
     public static PlayerManager get() {

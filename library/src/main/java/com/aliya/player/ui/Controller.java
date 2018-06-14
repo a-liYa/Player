@@ -11,6 +11,7 @@ import android.view.View;
 import com.aliya.player.Control;
 import com.aliya.player.Extra;
 import com.aliya.player.PlayerListener;
+import com.aliya.player.PlayerManager;
 import com.aliya.player.R;
 import com.aliya.player.ui.control.BottomProgressControl;
 import com.aliya.player.ui.control.BufferControl;
@@ -46,7 +47,7 @@ public class Controller {
     private ErrorControl errorControl;
     private BottomProgressControl bottomProgressControl;
     private MuteControl muteControl;
-    private MobileNetControl mobileControl;
+    private Control mobileControl;
 
     private PlayerView playerView;
 
@@ -92,12 +93,19 @@ public class Controller {
     public Controller(PlayerView parentView) {
         this.playerView = parentView;
         componentListener = new ComponentListener();
+
         navBarControl = new NavBarControl(this);
         errorControl = new ErrorControl(this);
         bufferControl = new BufferControl(this);
         bottomProgressControl = new BottomProgressControl(this);
         muteControl = new MuteControl(this);
-        mobileControl = new MobileNetControl(this);
+
+        Control.Factory factory = PlayerManager.getControlFactory(MobileNetControl.class);
+        if (factory != null) {
+            mobileControl = factory.newControl(this);
+        } else {
+            mobileControl = new MobileNetControl(this);
+        }
 
         calcTime = new CalcTime();
     }
@@ -277,14 +285,14 @@ public class Controller {
             if (!mobileControl.isVisible()) {
                 mobileControl.setVisibility(true);
             }
-            mobileControl.setTextHint(R.string.player_hint_mobile_network);
+            mobileControl.onControl(R.string.player_hint_mobile_network);
         }
     }
 
     private void showWiFiNetwork() {
         if (mobileControl != null) {
             if (mobileControl.isVisible()) {
-                mobileControl.setTextHint(R.string.player_hint_wifi_network);
+                mobileControl.onControl(R.string.player_hint_wifi_network);
             }
         }
     }

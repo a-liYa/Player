@@ -16,6 +16,7 @@ import com.aliya.player.R;
 import com.aliya.player.ui.control.BottomProgressControl;
 import com.aliya.player.ui.control.BufferControl;
 import com.aliya.player.ui.control.CalcTime;
+import com.aliya.player.ui.control.CompletionControl;
 import com.aliya.player.ui.control.ErrorControl;
 import com.aliya.player.ui.control.MobileNetControl;
 import com.aliya.player.ui.control.MuteControl;
@@ -48,6 +49,7 @@ public class Controller {
     private BottomProgressControl bottomProgressControl;
     private MuteControl muteControl;
     private Control mobileControl;
+    private Control completionControl;
 
     private PlayerView playerView;
 
@@ -100,11 +102,16 @@ public class Controller {
         bottomProgressControl = new BottomProgressControl(this);
         muteControl = new MuteControl(this);
 
-        Control.Factory factory = PlayerManager.getControlFactory(MobileNetControl.class);
-        if (factory != null) {
-            mobileControl = factory.newControl(this);
-        } else {
-            mobileControl = new MobileNetControl(this);
+        {
+            Control.Factory factory = PlayerManager.getControlFactory(MobileNetControl.class);
+            mobileControl = factory != null ?
+                    factory.newControl(this) : new MobileNetControl(this);
+        }
+
+        {
+            Control.Factory factory = PlayerManager.getControlFactory(CompletionControl.class);
+            completionControl = factory != null ?
+                    factory.newControl(this) : new CompletionControl(this);
         }
 
         calcTime = new CalcTime();
@@ -125,11 +132,13 @@ public class Controller {
                 R.id.player_bottom_progress_bar));
         muteControl.onViewCreate(findViewById(playerView, R.id.player_ic_volume));
         mobileControl.onViewCreate(findViewById(playerView, R.id.player_stub_mobile_network));
+        completionControl.onViewCreate(findViewById(playerView, R.id.player_stub_play_completion));
 
         bufferControl.setVisibilityListener(componentListener);
         navBarControl.setVisibilityListener(componentListener);
         errorControl.setVisibilityListener(componentListener);
         mobileControl.setVisibilityListener(componentListener);
+        completionControl.setVisibilityListener(componentListener);
 
         updateControlClickSwitch();
 
@@ -142,19 +151,11 @@ public class Controller {
     }
 
     private void updateControlClickSwitch() {
-        View.OnClickListener listener = componentListener;
-        if (bufferControl != null && bufferControl.isVisible()) {
-            listener = null;
-        }
-        if (errorControl != null && errorControl.isVisible()) {
-            listener = null;
-        }
-        if (mobileControl != null && mobileControl.isVisible()) {
-            listener = null;
-        }
-
         if (playerView != null) {
-            playerView.setOnClickListener(listener);
+            playerView.setOnClickListener(
+                    (errorControl.isVisible() || bufferControl.isVisible() ||
+                            mobileControl.isVisible() || completionControl.isVisible())
+                            ? null : componentListener);
         }
     }
 
@@ -166,7 +167,8 @@ public class Controller {
             this.player = player;
             unregisterNetStateChange();
             if (player != null) {
-                setVisibilityControls(false, bufferControl, errorControl, mobileControl);
+                setVisibilityControls(false, bufferControl, errorControl, mobileControl,
+                        completionControl);
                 player.addListener(componentListener);
                 if (muteControl != null) {
                     muteControl.updateVolume();
@@ -225,6 +227,10 @@ public class Controller {
 
         if (errorControl != null && synced.errorControl != null) {
             errorControl.setVisibility(synced.errorControl.isVisible());
+        }
+
+        if (completionControl != null && synced.completionControl != null) {
+            completionControl.setVisibility(synced.completionControl.isVisible());
         }
 
         if (mobileControl != null) {
@@ -316,8 +322,7 @@ public class Controller {
             } else if (playbackState == Player.STATE_ENDED) { // 播完毕
                 if (playerView != null) {
                     playerView.stop();
-                    errorControl.showPlayEnded();
-                    updateControlClickSwitch();
+                    completionControl.setVisibility(true);
                     PlayerListener listener = playerView.getPlayerListener();
                     if (listener != null) {
                         listener.playEnded();
@@ -399,7 +404,7 @@ public class Controller {
                     setVisibilityControls(false, navBarControl, bottomProgressControl);
                 } else if (control == errorControl) {
                     setVisibilityControls(false, navBarControl, bufferControl,
-                            bottomProgressControl);
+                            bottomProgressControl, completionControl);
                 } else if (control == navBarControl) {
                     setVisibilityControls(false, bottomProgressControl);
                     setVisibilityControls(true, muteControl);
@@ -408,10 +413,12 @@ public class Controller {
                             bottomProgressControl);
                 }
             } else {
-                if (control == errorControl || control == mobileControl) {
+                if (control == errorControl || control == completionControl
+                        || control == mobileControl) {
                     updateControlClickSwitch();
                 } else if (control == navBarControl) {
-                    if (!errorControl.isVisible() && !bufferControl.isVisible()) {
+                    if (!errorControl.isVisible() && !completionControl.isVisible() &&
+                            !bufferControl.isVisible()) {
                         setVisibilityControls(true, bottomProgressControl);
                     }
                     setVisibilityControls(false, muteControl);
@@ -419,11 +426,12 @@ public class Controller {
                     if (!navBarControl.isVisible()) {
                         setVisibilityControls(true, bottomProgressControl);
                     }
-                } else if (control == errorControl) {
-                    if (!navBarControl.isVisible()) {
-                        setVisibilityControls(true, bottomProgressControl);
-                    }
                 }
+//                else if (control == errorControl) {
+//                    if (!navBarControl.isVisible()) {
+//                        setVisibilityControls(true, bottomProgressControl);
+//                    }
+//                }
             }
         }
     }

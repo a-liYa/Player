@@ -116,4 +116,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!--播放完毕、分享与重播-->
+    <ViewStub
+        android:id="@id/player_stub_play_completion"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </merge>

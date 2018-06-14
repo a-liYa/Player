@@ -11,18 +11,18 @@ import com.aliya.player.ui.PlayerView;
 import com.aliya.player.utils.Utils;
 
 /**
- * ErrorControl
+ * CompletionControl
  *
  * @author a_liYa
  * @date 2017/8/13 11:19.
  */
-public class ErrorControl extends AbsControl {
+public class CompletionControl extends AbsControl {
 
     private ViewStub viewStub;
     private View rootView;
     private TextView tvHint;
 
-    public ErrorControl(Controller controller) {
+    public CompletionControl(Controller controller) {
         super(controller);
     }
 
@@ -30,7 +30,7 @@ public class ErrorControl extends AbsControl {
     public void onViewCreate(View view) {
         if (view instanceof ViewStub) {
             viewStub = (ViewStub) view;
-            viewStub.setLayoutResource(R.layout.module_player_layout_error);
+            viewStub.setLayoutResource(R.layout.module_player_layout_completion);
         }
     }
 

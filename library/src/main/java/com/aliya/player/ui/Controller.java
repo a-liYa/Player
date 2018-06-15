@@ -21,6 +21,7 @@ import com.aliya.player.ui.control.ErrorControl;
 import com.aliya.player.ui.control.MobileNetControl;
 import com.aliya.player.ui.control.MuteControl;
 import com.aliya.player.ui.control.NavBarControl;
+import com.aliya.player.ui.control.TitleControl;
 import com.aliya.player.utils.Recorder;
 import com.aliya.player.utils.Utils;
 import com.google.android.exoplayer2.C;
@@ -50,6 +51,7 @@ public class Controller {
     private MuteControl muteControl;
     private Control mobileControl;
     private Control completionControl;
+    private Control titleControl;
 
     private PlayerView playerView;
 
@@ -114,6 +116,12 @@ public class Controller {
                     factory.newControl(this) : new CompletionControl(this);
         }
 
+        {
+            Control.Factory factory = PlayerManager.getControlFactory(TitleControl.class);
+            titleControl = factory != null ?
+                    factory.newControl(this) : new TitleControl(this);
+        }
+
         calcTime = new CalcTime();
     }
 
@@ -133,6 +141,7 @@ public class Controller {
         muteControl.onViewCreate(findViewById(playerView, R.id.player_ic_volume));
         mobileControl.onViewCreate(findViewById(playerView, R.id.player_stub_mobile_network));
         completionControl.onViewCreate(findViewById(playerView, R.id.player_stub_play_completion));
+        titleControl.onViewCreate(findViewById(playerView, R.id.player_stub_title));
 
         bufferControl.setVisibilityListener(componentListener);
         navBarControl.setVisibilityListener(componentListener);
@@ -407,7 +416,7 @@ public class Controller {
                             bottomProgressControl, completionControl);
                 } else if (control == navBarControl) {
                     setVisibilityControls(false, bottomProgressControl);
-                    setVisibilityControls(true, muteControl);
+                    setVisibilityControls(true, muteControl, titleControl);
                 } else if (control == mobileControl) {
                     setVisibilityControls(false, navBarControl, bufferControl,
                             bottomProgressControl);
@@ -421,7 +430,7 @@ public class Controller {
                             !bufferControl.isVisible()) {
                         setVisibilityControls(true, bottomProgressControl);
                     }
-                    setVisibilityControls(false, muteControl);
+                    setVisibilityControls(false, muteControl, titleControl);
                 } else if (control == bufferControl) {
                     if (!navBarControl.isVisible()) {
                         setVisibilityControls(true, bottomProgressControl);

@@ -16,6 +16,7 @@
     <item name="player_stub_play_error" type="id" />
     <item name="player_stub_mobile_network" type="id" />
     <item name="player_stub_play_completion" type="id" />
+    <item name="player_stub_title" type="id" />
 
     <item name="player_view" type="id" />
 

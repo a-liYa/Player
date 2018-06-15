@@ -122,4 +122,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <!--播放器标题+返回图标-->
+    <ViewStub
+        android:id="@id/player_stub_title"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </merge>

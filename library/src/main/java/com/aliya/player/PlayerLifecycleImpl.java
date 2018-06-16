@@ -1,5 +1,7 @@
 package com.aliya.player;
 
+import android.support.annotation.NonNull;
+
 import com.aliya.player.lifecycle.LifecycleListener;
 import com.aliya.player.ui.PlayerView;
 
@@ -14,29 +16,36 @@ public class PlayerLifecycleImpl implements LifecycleListener {
 
     private SoftReference<PlayerView> playerViewSoft;
     private boolean lifecycleFollowFlag = true; // true:表示跟随生命周期
+    LifecycleState mState = LifecycleState.INITIALIZED;
 
     public PlayerLifecycleImpl(PlayerView playerManager) {
         playerViewSoft = new SoftReference<>(playerManager);
     }
 
     @Override
-    public void onStart() {
+    public void onCreate() {
+        mState = LifecycleState.CREATED;
+    }
 
+    @Override
+    public void onStart() {
+        mState = LifecycleState.STARTED;
     }
 
     @Override
     public void onResume() {
-
+        mState = LifecycleState.RESUMED;
     }
 
     @Override
     public void onPause() {
+        mState = LifecycleState.STARTED;
         stopPlayer();
     }
 
     @Override
     public void onStop() {
-
+        mState = LifecycleState.CREATED;
     }
 
     @Override
@@ -44,6 +53,21 @@ public class PlayerLifecycleImpl implements LifecycleListener {
         if (hidden) {
             stopPlayer();
         }
+    }
+
+    @Override
+    public void onDestroy() {
+        mState = LifecycleState.DESTROYED;
+    }
+
+    @Override
+    public void onDetach() {
+        mState = LifecycleState.INITIALIZED;
+    }
+
+    @Override
+    public boolean isAtLeast(@NonNull LifecycleState state) {
+        return mState.isAtLeast(state);
     }
 
     public boolean isLifecycleFollowFlag() {

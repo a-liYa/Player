@@ -2,6 +2,7 @@ package com.aliya.player.ui;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.media.AudioManager;
 import android.net.Uri;
 import android.support.annotation.AttrRes;
@@ -14,6 +15,7 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
+import android.view.ViewTreeObserver;
 import android.widget.FrameLayout;
 
 import com.aliya.player.FullscreenActivity;
@@ -23,6 +25,7 @@ import com.aliya.player.PlayerLifecycleImpl;
 import com.aliya.player.PlayerListener;
 import com.aliya.player.PlayerManager;
 import com.aliya.player.R;
+import com.aliya.player.lifecycle.LifecycleListener;
 import com.aliya.player.lifecycle.LifecycleUtils;
 import com.aliya.player.ui.widget.AspectRatioFrameLayout;
 import com.aliya.player.utils.Recorder;
@@ -48,7 +51,7 @@ import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
  * @author a_liYa
  * @date 2017/8/10 16:40.
  */
-public class PlayerView extends FrameLayout {
+public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDrawListener {
 
     private View surfaceView;
     private AspectRatioFrameLayout contentFrame;
@@ -248,6 +251,24 @@ public class PlayerView extends FrameLayout {
         mOnAudioFocusChangeListener = listener;
     }
 
+    private Rect mRect = new Rect();
+
+    @Override
+    public boolean onPreDraw() {
+        if (playerLifecycle.isAtLeast(LifecycleListener.LifecycleState.RESUMED)) {
+            if (!isShown() || !getGlobalVisibleRect(mRect)) {
+                // post 为了防止SurfaceView#mScrollChangedListener内部Display.getDisplayId()空指针
+                post(new Runnable() {
+                    @Override
+                    public void run() {
+                        release();
+                    }
+                });
+            }
+        }
+        return true;
+    }
+
     private class ReleaseRunnable implements Runnable {
 
         private SimpleExoPlayer mInnerPlayer;
@@ -345,6 +366,7 @@ public class PlayerView extends FrameLayout {
         super.onAttachedToWindow();
         controller.updateIcFullscreen();
         LifecycleUtils.addVideoLifecycle(this, playerLifecycle);
+        getViewTreeObserver().addOnPreDrawListener(this);
     }
 
     @Override
@@ -352,6 +374,7 @@ public class PlayerView extends FrameLayout {
         super.onDetachedFromWindow();
         fullscreen = false;
         LifecycleUtils.removeVideoLifecycle(this, playerLifecycle);
+        getViewTreeObserver().removeOnPreDrawListener(this);
     }
 
     private final class ComponentListener implements SimpleExoPlayer.VideoListener,

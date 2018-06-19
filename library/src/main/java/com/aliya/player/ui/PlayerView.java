@@ -29,6 +29,7 @@ import com.aliya.player.lifecycle.LifecycleListener;
 import com.aliya.player.lifecycle.LifecycleUtils;
 import com.aliya.player.ui.widget.AspectRatioFrameLayout;
 import com.aliya.player.utils.Recorder;
+import com.aliya.player.utils.Utils;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -57,7 +58,6 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
     private AspectRatioFrameLayout contentFrame;
 
     private String mUrl;
-    private boolean fullscreen;
 
     private SimpleExoPlayer player;
     private Controller controller;
@@ -298,11 +298,14 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
         if (getParent() instanceof ViewGroup) {
             ((ViewGroup) getParent()).removeView(this);
         }
-        fullscreen = false;
     }
 
     public boolean isFullscreen() {
-        return fullscreen;
+        ViewParent parent = getParent();
+        if (parent instanceof View) {
+            return Utils.getActivity(((View) parent).getContext()) instanceof FullscreenActivity;
+        }
+        return false;
     }
 
     /**
@@ -312,7 +315,6 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
      */
     public void syncRegime(PlayerView synced) {
         if (controller != null && synced != null) {
-            fullscreen = synced.fullscreen;
             mUrl = synced.mUrl;
             backupParentSoft = synced.backupParentSoft;
             controller.syncRegime(synced.controller);
@@ -322,7 +324,7 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
     }
 
     public void switchFullScreen() {
-        if (fullscreen) {
+        if (isFullscreen()) {
             exitFullscreen();
         } else {
             startFullScreen();
@@ -330,7 +332,6 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
     }
 
     public void startFullScreen() {
-        fullscreen = true;
         LifecycleUtils.removeVideoLifecycle(this, playerLifecycle);
         ViewParent parent = getParent();
         if (parent instanceof FrameLayout) {
@@ -344,7 +345,6 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
     }
 
     public void exitFullscreen() {
-        fullscreen = false;
         LifecycleUtils.removeVideoLifecycle(this, playerLifecycle);
         PlayerListener listener = getPlayerListener();
         if (listener != null) {
@@ -372,7 +372,6 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
     @Override
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
-        fullscreen = false;
         LifecycleUtils.removeVideoLifecycle(this, playerLifecycle);
         getViewTreeObserver().removeOnPreDrawListener(this);
     }

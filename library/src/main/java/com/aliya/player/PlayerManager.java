@@ -7,6 +7,7 @@ import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -83,6 +84,8 @@ public class PlayerManager {
         play(parent, url, childIndex, null);
     }
 
+    private boolean fullScreenPost = false;
+
     public void play(FrameLayout parent, String url, int childIndex, Object extraData) {
         if (TextUtils.isEmpty(url) || parent == null) return;
         mHelper.setContext(parent.getContext());
@@ -104,6 +107,8 @@ public class PlayerManager {
             } else {
                 parent.addView(mSmoothPlayerView, childIndex, mPlayerLayoutParams);
             }
+
+            fullScreenPost = true;
             mSmoothPlayerView.post(mSmoothSwitchRunnable);
             if (extraData == null) { // 取复用View的数据
                 extraData = Extra.getExtraData(mPlayerView);
@@ -158,6 +163,7 @@ public class PlayerManager {
         @Override
         public void run() {
             smoothSwitchView();
+            fullScreenPost = false;
         }
     };
 
@@ -165,7 +171,6 @@ public class PlayerManager {
      * 平滑的切换视频依赖的View
      */
     private void smoothSwitchView() {
-
         if (mPlayerView == mSmoothPlayerView || mPlayerView.getPlayer() == null) {
             return;
         }
@@ -258,8 +263,10 @@ public class PlayerManager {
         @Override
         public void onViewDetachedFromWindow(View v) {
             if (mPlayerView != null && mPlayerView.getParent() == v) {
-                // 视频父容器被删除
-                mPlayerView.release();
+                if (!fullScreenPost) {
+                    // 视频父容器被删除
+                    mPlayerView.release();
+                }
             } else if (mSmoothPlayerView != null && mSmoothPlayerView.getParent() == v) {
                 // 视频父容器被删除
                 mSmoothPlayerView.release();

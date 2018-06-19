@@ -257,13 +257,15 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
     public boolean onPreDraw() {
         if (playerLifecycle.isAtLeast(LifecycleListener.LifecycleState.RESUMED)) {
             if (!isShown() || !getGlobalVisibleRect(mRect)) {
-                // post 为了防止SurfaceView#mScrollChangedListener内部Display.getDisplayId()空指针
-                post(new Runnable() {
-                    @Override
-                    public void run() {
-                        release();
-                    }
-                });
+                if (!PlayerManager.get().isFullScreenPost()) {
+                    // post 为了防止SurfaceView#mScrollChangedListener内部Display.getDisplayId()空指针
+                    post(new Runnable() {
+                        @Override
+                        public void run() {
+                            release();
+                        }
+                    });
+                }
             }
         }
         return true;

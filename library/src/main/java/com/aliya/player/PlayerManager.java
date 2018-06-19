@@ -7,7 +7,6 @@ import android.os.SystemClock;
 import android.provider.Settings;
 import android.support.v4.content.LocalBroadcastManager;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -157,6 +156,10 @@ public class PlayerManager {
 
     public OrientationHelper getOrientationHelper() {
         return mOrientationHelper;
+    }
+
+    public boolean isFullScreenPost() {
+        return fullScreenPost;
     }
 
     private Runnable mSmoothSwitchRunnable = new Runnable() {

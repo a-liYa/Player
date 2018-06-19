@@ -79,7 +79,7 @@ public class PlayerLifecycleImpl implements LifecycleListener {
     }
 
     private void stopPlayer() {
-        if (lifecycleFollowFlag) {
+        if (lifecycleFollowFlag && !PlayerManager.get().isFullScreenPost()) {
             if (playerViewSoft != null && playerViewSoft.get() != null) {
                 playerViewSoft.get().release();
             }

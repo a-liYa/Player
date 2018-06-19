@@ -2,7 +2,6 @@ package com.aliya.player.ui.control;
 
 import android.view.View;
 import android.view.ViewStub;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aliya.player.R;
@@ -20,7 +19,6 @@ public class ErrorControl extends AbsControl {
 
     private ViewStub viewStub;
     private View rootView;
-    private TextView tvHint;
 
     public ErrorControl(Controller controller) {
         super(controller);
@@ -59,7 +57,6 @@ public class ErrorControl extends AbsControl {
             if (viewStub != null) {
                 rootView = viewStub.inflate();
                 viewStub = null;
-                tvHint = (TextView) rootView.findViewById(R.id.player_tv_hint);
                 View view = rootView.findViewById(R.id.player_click_retry);
                 view.setOnClickListener(mOnClickListener);
             }
@@ -81,7 +78,6 @@ public class ErrorControl extends AbsControl {
             if (view.getId() == R.id.player_click_retry) {
                 if (Utils.isAvailable(view.getContext()) && controller != null) {
                     setVisibility(false);
-                    tvHint.setText("播放失败");
                     PlayerView playerView = controller.getPlayerView();
                     if (playerView != null) {
                         playerView.replay();

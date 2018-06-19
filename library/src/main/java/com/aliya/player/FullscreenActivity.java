@@ -101,6 +101,9 @@ public class FullscreenActivity extends Activity {
 
     @Override
     public void onBackPressed() {
+        if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
         super.onBackPressed();
         exitFullscreen();
     }
@@ -137,6 +140,9 @@ public class FullscreenActivity extends Activity {
      * 播放器内部退出全屏操作
      */
     private void playerInnerExitFullscreen() {
+        if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
         super.onBackPressed();
     }
 

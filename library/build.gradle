@@ -1,7 +1,7 @@
 apply plugin: 'com.android.library'
 
-def vCode = 22
-def vName = '0.2.2'
+def vCode = 30
+def vName = '0.3.0.h24'
 def exoPlayerVersion = 'r2.5.2'
 
 android {
@@ -40,7 +40,7 @@ dependencies {
     compile('com.google.android.exoplayer:exoplayer-smoothstreaming:' + exoPlayerVersion) {
         exclude group: 'com.android.support'
     }
-    compile 'com.android.support:support-v4:25.3.1'
+    provided 'com.android.support:support-v4:25.3.1'
 }
 
 ext {

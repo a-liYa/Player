@@ -419,7 +419,10 @@ public class Controller {
                     setVisibilityControls(true, muteControl, titleControl);
                 } else if (control == mobileControl) {
                     setVisibilityControls(false, navBarControl, bufferControl,
-                            bottomProgressControl);
+                            bottomProgressControl, completionControl);
+                } else if (control == completionControl) {
+                    setVisibilityControls(false, navBarControl, bufferControl,
+                            bottomProgressControl, mobileControl);
                 }
             } else {
                 if (control == errorControl || control == completionControl

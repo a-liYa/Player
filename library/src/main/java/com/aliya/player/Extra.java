@@ -1,5 +1,6 @@
 package com.aliya.player;
 
+import android.util.Log;
 import android.view.View;
 
 /**
@@ -23,13 +24,45 @@ public class Extra {
         return url;
     }
 
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
     public Object getData() {
         return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
 
     public static void setExtra(View v, String url, Object data) {
         if (v != null) {
             v.setTag(R.id.player_tag_extra, new Extra(url, data));
+        }
+    }
+
+    public static void saveExtra(View v, String url) {
+        if (v != null) {
+            Object tag = v.getTag(R.id.player_tag_extra);
+            if (tag instanceof Extra) {
+                Extra extra = (Extra) tag;
+                extra.setUrl(url);
+            } else {
+                v.setTag(R.id.player_tag_extra, new Extra(url, null));
+            }
+        }
+    }
+
+    public static void saveExtra(View v, Object data) {
+        if (v != null) {
+            Object tag = v.getTag(R.id.player_tag_extra);
+            if (tag instanceof Extra) {
+                Extra extra = (Extra) tag;
+                extra.setData(data);
+            } else {
+               v.setTag(R.id.player_tag_extra, new Extra("", data));
+            }
         }
     }
 

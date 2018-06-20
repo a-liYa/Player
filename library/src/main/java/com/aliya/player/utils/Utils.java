@@ -170,7 +170,8 @@ public class Utils {
     public static void setVisibilityControls(boolean isVisible, Control... controls) {
         if (controls != null) {
             for (Control control : controls) {
-                control.setVisibility(isVisible);
+                if (control != null)
+                    control.setVisibility(isVisible);
             }
         }
     }

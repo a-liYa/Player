@@ -9,7 +9,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.aliya.player.Control;
-import com.aliya.player.Extra;
 import com.aliya.player.R;
 import com.aliya.player.ui.Controller;
 import com.aliya.player.utils.Recorder;
@@ -48,7 +47,7 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
     @Override
     public void setVisibility(boolean isVisible) {
         // 已阻塞提醒过，直接toast提醒就行
-        if (isVisible && Recorder.get().isAllowMobileTraffic(Extra.getExtraUrl(getPlayerView()))) {
+        if (isVisible && Recorder.get().isAllowMobileTraffic(controller.getUrl())) {
             Context context = getContext();
             if (context != null) {
                 Toast toast = Toast.makeText(context, R.string.player_mobile_traffic_alert,
@@ -113,7 +112,7 @@ public class MobileNetControl extends AbsControl implements View.OnClickListener
             if (tvHint != null && TextUtils.equals(
                     getContext().getString(R.string.player_hint_mobile_network),
                     tvHint.getText())) {
-                Recorder.get().allowMobileTraffic(Extra.getExtraUrl(getPlayerView()));
+                Recorder.get().allowMobileTraffic(controller.getUrl());
             }
             SimpleExoPlayer player = getPlayer();
             if (player != null) {

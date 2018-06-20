@@ -1,6 +1,5 @@
 package com.aliya.player;
 
-import android.util.Log;
 import android.view.View;
 
 /**

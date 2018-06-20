@@ -68,7 +68,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(this, ListActivity.class));
                 break;
             case R.id.btn_single:
-                PlayerManager.get().play(parent, "http://139.215.192.12/6975C1F05653282A8948EA5A78/03000A01005B1F882C392A856210078343B256-C2E6-4A6E-B82E-A28C734ED57B.mp4?ccode=0502&duration=84&expire=18000&psid=83ce5b2ddd399b1011913a5a331cc37b&sp=&ups_client_netip=77fe5c33&ups_ts=1528852009&ups_userid=462796718&utid=w0iSE01E0icCAXf%2BXDOlFv5B&vid=XMzY2MDMzMzU1Ng%3D%3D&vkey=Bddf6124d2128f50651729970ff0ea68c");
+                PlayerManager.get().play(parent, "http://cdn.v.zjol.com.cn/152058.mp4");
                 break;
         }
     }

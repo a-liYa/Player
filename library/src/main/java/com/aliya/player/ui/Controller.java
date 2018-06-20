@@ -9,7 +9,6 @@ import android.support.annotation.LayoutRes;
 import android.view.View;
 
 import com.aliya.player.Control;
-import com.aliya.player.Extra;
 import com.aliya.player.PlayerListener;
 import com.aliya.player.PlayerManager;
 import com.aliya.player.R;
@@ -207,12 +206,17 @@ public class Controller {
                 || player.getDuration() == C.TIME_UNSET) return;
 
         if (Math.abs(player.getDuration() - player.getCurrentPosition()) < 1000) {
-            Recorder.get().removeCacheProgress(Extra.getExtraUrl(playerView));
+            Recorder.get().removeCacheProgress(getUrl());
         } else {
             Recorder.get()
-                    .putCacheProgress(Extra.getExtraUrl(playerView), player.getCurrentPosition());
+                    .putCacheProgress(getUrl(), player.getCurrentPosition());
         }
 
+    }
+
+    public String getUrl() {
+        PlayerView playerView = getPlayerView();
+        return playerView != null ? playerView.getUrl() : "";
     }
 
     /**
@@ -312,16 +316,20 @@ public class Controller {
         }
     }
 
+    public void showBuffering() {
+        stopUpdateProgress();
+        if (!mobileControl.isVisible()) {
+            bufferControl.setVisibility(true);
+        }
+    }
+
     private final class ComponentListener implements Player.EventListener, View.OnClickListener,
             Control.VisibilityListener {
 
         @Override
         public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
             if (playbackState == Player.STATE_BUFFERING) { // 缓冲
-                stopUpdateProgress();
-                if (!mobileControl.isVisible()) {
-                    bufferControl.setVisibility(true);
-                }
+                showBuffering();
             } else if (playbackState == Player.STATE_READY) { // 播放
                 updateProgressAction.run();
                 bufferControl.setVisibility(false);

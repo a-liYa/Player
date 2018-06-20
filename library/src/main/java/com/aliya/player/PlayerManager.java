@@ -238,6 +238,12 @@ public class PlayerManager {
         }
     }
 
+    public static void setPlayerRequest(View parent, PlayerRequest request) {
+        if (parent != null) {
+            parent.setTag(R.id.player_tag_request, request);
+        }
+    }
+
     private final class GroupListener implements View.OnAttachStateChangeListener,
             OrientationListener, AudioManager.OnAudioFocusChangeListener {
 
@@ -360,20 +366,20 @@ public class PlayerManager {
             }
         }
 
-        private String toText(int orientation) {
-            switch (orientation) {
-                case ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE:
-                    return "横屏翻转";
-                case ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT:
-                    return "竖屏翻转";
-                case ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE:
-                    return "横屏";
-                case ActivityInfo.SCREEN_ORIENTATION_PORTRAIT:
-                    return "竖屏";
-
-            }
-            return "未知";
-        }
+//        private String toText(int orientation) {
+//            switch (orientation) {
+//                case ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE:
+//                    return "横屏翻转";
+//                case ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT:
+//                    return "竖屏翻转";
+//                case ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE:
+//                    return "横屏";
+//                case ActivityInfo.SCREEN_ORIENTATION_PORTRAIT:
+//                    return "竖屏";
+//
+//            }
+//            return "未知";
+//        }
 
     }
 

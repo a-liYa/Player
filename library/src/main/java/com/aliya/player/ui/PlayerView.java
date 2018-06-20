@@ -24,6 +24,7 @@ import com.aliya.player.PlayerHelper;
 import com.aliya.player.PlayerLifecycleImpl;
 import com.aliya.player.PlayerListener;
 import com.aliya.player.PlayerManager;
+import com.aliya.player.PlayerRequest;
 import com.aliya.player.R;
 import com.aliya.player.lifecycle.LifecycleListener;
 import com.aliya.player.lifecycle.LifecycleUtils;
@@ -116,10 +117,25 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
     }
 
     public void replay() {
-        if (!TextUtils.isEmpty(mUrl)) play(mUrl);
+        if (!TextUtils.isEmpty(mUrl)) play(mUrl, true);
     }
 
     public void play(String url) {
+        play(url, false);
+    }
+
+    public void play(String url, boolean ignoreRequest) {
+        ViewParent parent = getParent();
+        if (!ignoreRequest &&parent instanceof View) {
+            Object tag = ((View) parent).getTag(R.id.player_tag_request);
+            if (tag instanceof PlayerRequest) {
+                if(((PlayerRequest) tag).onRequest(this)) {
+                    controller.showBuffering();
+                    return;
+                }
+            }
+        }
+
         mUrl = url;
 
         // 1. Create a default TrackSelector

@@ -25,6 +25,7 @@
     <item name="player_tag_callback" type="id" />
     <item name="player_tag_attach_listener" type="id" />
     <item name="player_tag_reference" type="id" />
+    <item name="player_tag_request" type="id" />
 
     <item name="tag_fragment" type="id" />
 

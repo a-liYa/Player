@@ -47,7 +47,6 @@ public class PlayerManager {
         mOrientationHelper = new OrientationHelper();
         mPlayerLayoutParams = new LayoutParams(MATCH_PARENT, MATCH_PARENT);
         mGroupListener = new GroupListener();
-
     }
 
     private static Map<Class<? extends Control>, Control.Factory> sFactoryMap = new HashMap();
@@ -123,7 +122,7 @@ public class PlayerManager {
                 mPlayerView.setId(R.id.player_view);
             }
 
-            mPlayerView.stop();
+            mPlayerView.release();
 
             mPlayerView.removeOnAttachStateChangeListener(mGroupListener);
             mPlayerView.addOnAttachStateChangeListener(mGroupListener);

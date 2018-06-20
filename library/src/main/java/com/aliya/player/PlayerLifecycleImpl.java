@@ -40,7 +40,7 @@ public class PlayerLifecycleImpl implements LifecycleListener {
     @Override
     public void onPause() {
         mState = LifecycleState.STARTED;
-        stopPlayer();
+        releasePlayer();
     }
 
     @Override
@@ -51,7 +51,7 @@ public class PlayerLifecycleImpl implements LifecycleListener {
     @Override
     public void onHiddenChanged(boolean hidden) {
         if (hidden) {
-            stopPlayer();
+            releasePlayer();
         }
     }
 
@@ -78,7 +78,7 @@ public class PlayerLifecycleImpl implements LifecycleListener {
         this.lifecycleFollowFlag = lifecycleFollowFlag;
     }
 
-    private void stopPlayer() {
+    private void releasePlayer() {
         if (lifecycleFollowFlag && !PlayerManager.get().isFullScreenPost()) {
             if (playerViewSoft != null && playerViewSoft.get() != null) {
                 playerViewSoft.get().release();

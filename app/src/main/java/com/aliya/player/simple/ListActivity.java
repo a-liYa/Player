@@ -16,6 +16,7 @@ import android.widget.TextView;
 import com.aliya.player.Extra;
 import com.aliya.player.PlayerCallback;
 import com.aliya.player.PlayerManager;
+import com.aliya.player.PlayerRequest;
 import com.aliya.player.ui.PlayerView;
 
 import java.util.Arrays;
@@ -68,13 +69,13 @@ public class ListActivity extends AppCompatActivity {
         }
     }
 
-    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PlayerRequest {
 
         String mData;
 
         ImageView mIvBg;
         ImageView mIvPlayStart;
-        FrameLayout mParentPlayer;
+        FrameLayout mParent;
         TextView mTvTitle;
 
         public ViewHolder(ViewGroup parent) {
@@ -82,7 +83,7 @@ public class ListActivity extends AppCompatActivity {
                     .inflate(R.layout.item_layout_list, parent, false));
             mIvBg = (ImageView) itemView.findViewById(R.id.iv_bg);
             mIvPlayStart = (ImageView) itemView.findViewById(R.id.iv_play_start);
-            mParentPlayer = (FrameLayout) itemView.findViewById(R.id.parent_player);
+            mParent = (FrameLayout) itemView.findViewById(R.id.parent_player);
             mTvTitle = (TextView) itemView.findViewById(R.id.tv_title);
 
             mIvPlayStart.setOnClickListener(this);
@@ -99,8 +100,9 @@ public class ListActivity extends AppCompatActivity {
         public void onClick(View view) {
             switch (view.getId()) {
                 case R.id.iv_play_start:
-                    PlayerManager.get().play(mParentPlayer, mData, new String("position " + getAdapterPosition()));
-                    PlayerManager.setPlayerCallback(mParentPlayer, new PlayerCallback() {
+                    PlayerManager.setPlayerRequest(mParent, this);
+                    PlayerManager.get().play(mParent, mData, new String("position " + getAdapterPosition()));
+                    PlayerManager.setPlayerCallback(mParent, new PlayerCallback() {
                         @Override
                         public void onPause(PlayerView view) {
                             Log.e("TAG", "onPause " + Extra.getExtraData(view));
@@ -126,6 +128,17 @@ public class ListActivity extends AppCompatActivity {
 
                     break;
             }
+        }
+
+        @Override
+        public boolean onRequest(final PlayerView playerView) {
+            itemView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    playerView.play(mData, true);
+                }
+            }, 1000);
+            return true;
         }
     }
 }

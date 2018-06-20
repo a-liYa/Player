@@ -125,11 +125,14 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
     }
 
     public void play(String url, boolean ignoreRequest) {
+        mUrl = url;
+
+        // 拦截请求新地址
         ViewParent parent = getParent();
-        if (!ignoreRequest &&parent instanceof View) {
+        if (!ignoreRequest && parent instanceof View) {
             Object tag = ((View) parent).getTag(R.id.player_tag_request);
             if (tag instanceof PlayerRequest) {
-                if(((PlayerRequest) tag).onRequest(this)) {
+                if (((PlayerRequest) tag).onRequest(this)) {
                     controller.showBuffering();
                     return;
                 }
@@ -139,8 +142,6 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
         if (TextUtils.isEmpty(mUrl)) {
             controller.dispatchPlayerError();
         }
-
-        mUrl = url;
 
         // 1. Create a default TrackSelector
         // 数据传输相关，传输速度、传输监听等
@@ -324,6 +325,7 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
         if (getParent() instanceof ViewGroup) {
             ((ViewGroup) getParent()).removeView(this);
         }
+        controller.reset();
     }
 
     public boolean isFullscreen() {

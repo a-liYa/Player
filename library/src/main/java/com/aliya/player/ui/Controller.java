@@ -327,6 +327,11 @@ public class Controller {
         componentListener.onPlayerError(null);
     }
 
+    public void reset() {
+        setVisibilityControls(false, bufferControl, errorControl, mobileControl,
+                completionControl, navBarControl);
+    }
+
     private final class ComponentListener implements Player.EventListener, View.OnClickListener,
             Control.VisibilityListener {
 

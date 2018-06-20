@@ -318,9 +318,13 @@ public class Controller {
 
     public void showBuffering() {
         stopUpdateProgress();
-        if (!mobileControl.isVisible()) {
+        if (!mobileControl.isVisible() && !errorControl.isVisible()) {
             bufferControl.setVisibility(true);
         }
+    }
+
+    public void dispatchPlayerError() {
+        componentListener.onPlayerError(null);
     }
 
     private final class ComponentListener implements Player.EventListener, View.OnClickListener,

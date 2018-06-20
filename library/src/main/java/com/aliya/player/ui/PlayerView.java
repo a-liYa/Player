@@ -117,7 +117,7 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
     }
 
     public void replay() {
-        if (!TextUtils.isEmpty(mUrl)) play(mUrl, true);
+        play(mUrl);
     }
 
     public void play(String url) {
@@ -134,6 +134,10 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
                     return;
                 }
             }
+        }
+
+        if (TextUtils.isEmpty(mUrl)) {
+            controller.dispatchPlayerError();
         }
 
         mUrl = url;
@@ -164,6 +168,10 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
             player.seekTo(progress);
         }
 
+    }
+
+    public Controller getController() {
+        return controller;
     }
 
     /**

@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.ContextWrapper;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Looper;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -190,6 +191,13 @@ public class Utils {
             context = ((ContextWrapper) context).getBaseContext();
         }
         return null;
+    }
+
+    /**
+     * 判断当前的线程是不是在主线程
+     */
+    public static boolean isRunInMainThread() {
+        return Looper.getMainLooper().getThread() == Thread.currentThread();
     }
 
 }

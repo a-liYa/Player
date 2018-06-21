@@ -15,6 +15,7 @@ import android.widget.FrameLayout;
 import com.aliya.player.gravity.OrientationHelper;
 import com.aliya.player.gravity.OrientationListener;
 import com.aliya.player.ui.PlayerView;
+import com.aliya.player.utils.Utils;
 
 import java.lang.ref.SoftReference;
 import java.util.HashMap;
@@ -351,7 +352,16 @@ public class PlayerManager {
                 case AudioManager.AUDIOFOCUS_LOSS: // 其他App请求焦点，未知时长
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT: // 其他App请求焦点，临时的
                     if (mPlayerView != null) {
-                        mPlayerView.pause();
+                        if (Utils.isRunInMainThread()) {
+                            mPlayerView.pause();
+                        } else {
+                            mPlayerView.post(new Runnable() {
+                                @Override
+                                public void run() {
+                                    mPlayerView.pause();
+                                }
+                            });
+                        }
                     }
                     break;
                 case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK: // 其他App请求焦点，临时的，可降低音量不用停止
@@ -364,21 +374,6 @@ public class PlayerManager {
                     break;
             }
         }
-
-//        private String toText(int orientation) {
-//            switch (orientation) {
-//                case ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE:
-//                    return "横屏翻转";
-//                case ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT:
-//                    return "竖屏翻转";
-//                case ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE:
-//                    return "横屏";
-//                case ActivityInfo.SCREEN_ORIENTATION_PORTRAIT:
-//                    return "竖屏";
-//
-//            }
-//            return "未知";
-//        }
 
     }
 

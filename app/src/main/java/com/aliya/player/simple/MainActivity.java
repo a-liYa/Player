@@ -9,9 +9,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.aliya.player.PlayerManager;
-import com.aliya.player.PlayerRequest;
 import com.aliya.player.gravity.OrientationListener;
-import com.aliya.player.ui.PlayerView;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
         OrientationListener {
@@ -70,18 +68,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 startActivity(new Intent(this, ListActivity.class));
                 break;
             case R.id.btn_single:
-                PlayerManager.setPlayerRequest(parent, new PlayerRequest() {
-                    int count = 0;
-                    @Override
-                    public boolean onRequest(PlayerView playerView) {
-                        if (count++ % 2 == 0) {
-                            playerView.getController().dispatchPlayerError();
-                        } else {
-                            playerView.play("http://cdn.v.zjol.com.cn/152058.mp4", true);
-                        }
-                        return true;
-                    }
-                });
                 PlayerManager.get().play(parent, "http://cdn.v.zjol.com.cn/152058.mp4");
                 break;
         }

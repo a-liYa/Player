@@ -175,7 +175,7 @@ public class Controller {
             this.player = player;
             unregisterNetStateChange();
             if (player != null) {
-                setVisibilityControls(false, bufferControl, errorControl, mobileControl,
+                setVisibilityControls(false, errorControl, mobileControl,
                         completionControl);
                 player.addListener(componentListener);
                 if (muteControl != null) {

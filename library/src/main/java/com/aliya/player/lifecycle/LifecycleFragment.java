@@ -3,7 +3,6 @@ package com.aliya.player.lifecycle;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 /**
  * 视频生命周期管理 Fragment
@@ -13,9 +12,10 @@ import android.util.Log;
  */
 public class LifecycleFragment extends Fragment {
 
-    private LifecycleListener mLifecycle;
     // 是否已经异步删除
     private boolean isAsyncRemove;
+
+    private LifecycleListener mLifecycle;
 
     public LifecycleListener getLifecycleListener() {
         return mLifecycle;
@@ -29,6 +29,9 @@ public class LifecycleFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         isAsyncRemove = false;
+        if (mLifecycle != null) {
+            mLifecycle.onCreate();
+        }
     }
 
     @Override
@@ -66,14 +69,28 @@ public class LifecycleFragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mLifecycle = null;
+        if (mLifecycle != null) {
+            mLifecycle.onDestroy();
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        if (mLifecycle != null) {
+            mLifecycle.onDetach();
+            mLifecycle = null;
+        }
     }
 
     /**
      * 标记已经异步删除
      */
     public void tagAsyncRemove() {
-        mLifecycle = null;
+        if (mLifecycle != null) {
+            mLifecycle.onDetach();
+            mLifecycle = null;
+        }
         isAsyncRemove = true;
     }
 

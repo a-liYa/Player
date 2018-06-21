@@ -49,13 +49,6 @@ public class PlayerLifecycleImpl implements LifecycleListener {
     }
 
     @Override
-    public void onHiddenChanged(boolean hidden) {
-        if (hidden) {
-            releasePlayer();
-        }
-    }
-
-    @Override
     public void onDestroy() {
         mState = LifecycleState.DESTROYED;
     }

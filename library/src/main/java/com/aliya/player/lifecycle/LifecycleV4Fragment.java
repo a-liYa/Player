@@ -1,5 +1,7 @@
 package com.aliya.player.lifecycle;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
 /**
@@ -21,6 +23,15 @@ public class LifecycleV4Fragment extends Fragment {
 
     public void setLifecycleListener(LifecycleListener lifecycleListener) {
         mLifecycle = lifecycleListener;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        isAsyncRemove = false;
+        if (mLifecycle != null) {
+            mLifecycle.onCreate();
+        }
     }
 
     @Override
@@ -58,14 +69,17 @@ public class LifecycleV4Fragment extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        mLifecycle = null;
+        if (mLifecycle != null) {
+            mLifecycle.onDestroy();
+        }
     }
 
     @Override
-    public void onHiddenChanged(boolean hidden) {
-        super.onHiddenChanged(hidden);
+    public void onDetach() {
+        super.onDetach();
         if (mLifecycle != null) {
-            mLifecycle.onHiddenChanged(hidden);
+            mLifecycle.onDetach();
+            mLifecycle = null;
         }
     }
 
@@ -73,7 +87,10 @@ public class LifecycleV4Fragment extends Fragment {
      * 标记已经异步删除
      */
     public void tagAsyncRemove() {
-        mLifecycle = null;
+        if (mLifecycle != null) {
+            mLifecycle.onDetach();
+            mLifecycle = null;
+        }
         isAsyncRemove = true;
     }
 

@@ -19,8 +19,6 @@ public interface LifecycleListener {
 
     void onStop();
 
-    void onHiddenChanged(boolean hidden);
-
     void onDestroy();
 
     void onDetach();

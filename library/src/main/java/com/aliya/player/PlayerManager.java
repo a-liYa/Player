@@ -85,7 +85,7 @@ public class PlayerManager {
     private boolean fullScreenPost = false;
 
     public void play(FrameLayout parent, String url, int childIndex, Object extraData) {
-        if (TextUtils.isEmpty(url) || parent == null) return;
+        if (parent == null) return;
         mHelper.setContext(parent.getContext());
 
         if (TextUtils.equals(mBackupUrl, url) && mPlayerView != null && !mPlayerView.isStop()) {

@@ -141,6 +141,7 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
 
         if (TextUtils.isEmpty(mUrl)) {
             controller.dispatchPlayerError();
+            return;
         }
 
         // 1. Create a default TrackSelector

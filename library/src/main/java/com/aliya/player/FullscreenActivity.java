@@ -104,7 +104,11 @@ public class FullscreenActivity extends Activity {
         if (getRequestedOrientation() != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
-        super.onBackPressed();
+        try {
+            super.onBackPressed();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         exitFullscreen();
     }
 

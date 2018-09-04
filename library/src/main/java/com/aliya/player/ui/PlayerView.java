@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.SurfaceView;
+import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewParent;
@@ -100,7 +101,8 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
         addView(contentFrame, lp);
 
         // 2、add surfaceView to video view
-        surfaceView = new SurfaceView(context);
+        // surfaceView = new SurfaceView(context);
+        surfaceView = new TextureView(context);
         contentFrame.addView(surfaceView, MATCH_PARENT, MATCH_PARENT);
 
         if (controller != null) {
@@ -220,6 +222,8 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
 
             if (surfaceView instanceof SurfaceView) {
                 this.player.clearVideoSurfaceView((SurfaceView) surfaceView);
+            } else if (surfaceView instanceof TextureView) {
+                this.player.clearVideoTextureView((TextureView) surfaceView);
             }
         }
 
@@ -231,6 +235,8 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
 
             if (surfaceView instanceof SurfaceView) {
                 player.setVideoSurfaceView((SurfaceView) surfaceView);
+            } else if (surfaceView instanceof TextureView) {
+                player.setVideoTextureView((TextureView) surfaceView);
             }
 
             player.addVideoListener(componentListener);
@@ -257,7 +263,9 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
             if (surfaceView instanceof SurfaceView) {
                 player.clearVideoSurfaceView((SurfaceView) surfaceView);
             }
-
+            if (surfaceView instanceof TextureView) {
+                player.clearVideoTextureView((TextureView) surfaceView);
+            }
             // 必须在 #clearVideoSurfaceView 之后调用，解决异步带来的ANR
             service.execute(new ReleaseRunnable(player));
 
@@ -357,6 +365,15 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
             exitFullscreen();
         } else {
             startFullScreen();
+        }
+    }
+
+    @Override
+    public void setVisibility(int visibility) {
+        super.setVisibility(visibility);
+        if (surfaceView instanceof SurfaceView) {
+            // Work around https://github.com/google/ExoPlayer/issues/3160.
+            surfaceView.setVisibility(visibility);
         }
     }
 

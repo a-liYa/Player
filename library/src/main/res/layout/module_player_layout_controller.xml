@@ -32,6 +32,8 @@
             android:minHeight="1dp"
             android:paddingEnd="6dp"
             android:paddingStart="6dp"
+            android:paddingTop="11dp"
+            android:paddingBottom="11dp"
             android:progressDrawable="@drawable/module_player_seek_bar_drawable"
             android:thumb="@drawable/module_player_seek_bar_thumb" />
 

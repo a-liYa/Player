@@ -51,6 +51,7 @@ public class PlayerManager {
     }
 
     private static Map<Class<? extends Control>, Control.Factory> sFactoryMap = new HashMap();
+
     public static void registerControl(Class<? extends Control> key, Control.Factory factory) {
         sFactoryMap.put(key, factory);
     }
@@ -101,6 +102,9 @@ public class PlayerManager {
             mSmoothPlayerView.removeOnAttachStateChangeListener(mGroupListener);
             mSmoothPlayerView.addOnAttachStateChangeListener(mGroupListener);
 
+            if (mSmoothPlayerView.getParent() instanceof ViewGroup) {
+                ((ViewGroup) mSmoothPlayerView.getParent()).removeView(mSmoothPlayerView);
+            }
             if (childIndex < 0 || childIndex > parent.getChildCount()) { // 在最后一个位置插入
                 parent.addView(mSmoothPlayerView, mPlayerLayoutParams);
             } else {

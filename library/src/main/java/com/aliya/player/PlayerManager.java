@@ -96,6 +96,7 @@ public class PlayerManager {
                 mSmoothPlayerView = new PlayerView(mHelper.getContext());
                 mSmoothPlayerView.setPlayerHelper(mHelper);
                 mSmoothPlayerView.setOnAudioFocusChangeListener(mGroupListener);
+                mSmoothPlayerView.setOnUrlChangeListener(mGroupListener);
                 mSmoothPlayerView.setId(R.id.player_view);
             }
 
@@ -124,6 +125,7 @@ public class PlayerManager {
                 mPlayerView = new PlayerView(mHelper.getContext());
                 mPlayerView.setPlayerHelper(mHelper);
                 mPlayerView.setOnAudioFocusChangeListener(mGroupListener);
+                mPlayerView.setOnUrlChangeListener(mGroupListener);
                 mPlayerView.setId(R.id.player_view);
             }
 
@@ -249,7 +251,7 @@ public class PlayerManager {
     }
 
     private final class GroupListener implements View.OnAttachStateChangeListener,
-            OrientationListener, AudioManager.OnAudioFocusChangeListener {
+            OrientationListener, AudioManager.OnAudioFocusChangeListener, OnUrlChangeListener {
 
         private int screenOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
         private long timeMillis;
@@ -378,6 +380,16 @@ public class PlayerManager {
                     break;
             }
         }
+
+        @Override
+        public void onUrlChange(String url) {
+            mBackupUrl = url;
+        }
+    }
+
+    public interface OnUrlChangeListener{
+
+        void onUrlChange(String url);
 
     }
 

@@ -70,6 +70,7 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
 
     public PlayerLifecycleImpl playerLifecycle;
     private AudioManager.OnAudioFocusChangeListener mOnAudioFocusChangeListener;
+    private PlayerManager.OnUrlChangeListener mOnUrlChangeListener;
 
     public PlayerView(@NonNull Context context) {
         this(context, null);
@@ -128,6 +129,8 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
 
     public void play(String url, boolean ignoreRequest) {
         mUrl = url;
+
+        if (mOnUrlChangeListener != null) mOnUrlChangeListener.onUrlChange(mUrl);
 
         // 拦截请求新地址
         ViewParent parent = getParent();
@@ -283,6 +286,10 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
 
     public void setOnAudioFocusChangeListener(AudioManager.OnAudioFocusChangeListener listener) {
         mOnAudioFocusChangeListener = listener;
+    }
+
+    public void setOnUrlChangeListener(PlayerManager.OnUrlChangeListener listener) {
+        mOnUrlChangeListener = listener;
     }
 
     private Rect mRect = new Rect();

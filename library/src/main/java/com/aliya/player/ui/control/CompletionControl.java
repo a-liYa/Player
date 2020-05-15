@@ -5,6 +5,8 @@ import android.view.ViewStub;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.aliya.player.PlayerCallback;
+import com.aliya.player.PlayerManager;
 import com.aliya.player.R;
 import com.aliya.player.ui.Controller;
 import com.aliya.player.ui.PlayerView;
@@ -85,6 +87,11 @@ public class CompletionControl extends AbsControl {
                     PlayerView playerView = controller.getPlayerView();
                     if (playerView != null) {
                         playerView.replay();
+                        // 回调播放完毕点击重播
+                        PlayerCallback callback = PlayerManager.getPlayerCallback(getParentView());
+                        if (callback != null) {
+                            callback.onReplay(playerView);
+                        }
                     }
                 } else {
                     Toast.makeText(view.getContext(), "网络不可用", Toast.LENGTH_SHORT).show();

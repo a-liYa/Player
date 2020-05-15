@@ -25,6 +25,13 @@ public interface PlayerCallback {
     void onPlay(PlayerView view);
 
     /**
+     * 重播 Callback
+     *
+     * @param view current player view
+     */
+    void onReplay(PlayerView view);
+
+    /**
      * 全屏／取消全屏 call back
      *
      * @param isFullscreen true : 切到全屏; false : 取消全屏

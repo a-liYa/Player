@@ -114,6 +114,11 @@ public class ListActivity extends AppCompatActivity {
                         }
 
                         @Override
+                        public void onReplay(PlayerView view) {
+                            Log.e("TAG", "onReplay: ");
+                        }
+
+                        @Override
                         public void onFullscreenChange(boolean isFullscreen, PlayerView view) {
                             Log.e("TAG", "onFullscreenChange " + isFullscreen + " - " + Extra.getExtraData(view));
                         }

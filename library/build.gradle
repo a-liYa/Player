@@ -2,8 +2,8 @@ apply plugin: 'com.android.library'
 
 def exoPlayerVersion = 'r2.5.2'
 ext {
-    version_code = 45
-    version_name = '0.4.5.h24'
+    version_code = 46
+    version_name = '0.4.6.h24'
 }
 
 android {
@@ -24,21 +24,21 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    api fileTree(dir: 'libs', include: ['*.jar'])
 
-    compile('com.google.android.exoplayer:exoplayer-core:' + exoPlayerVersion) {
+    api('com.google.android.exoplayer:exoplayer-core:' + exoPlayerVersion) {
         exclude group: 'com.android.support'
     }
-    compile('com.google.android.exoplayer:exoplayer-dash:' + exoPlayerVersion) {
+    api('com.google.android.exoplayer:exoplayer-dash:' + exoPlayerVersion) {
         exclude group: 'com.android.support'
     }
-    compile('com.google.android.exoplayer:exoplayer-hls:' + exoPlayerVersion) {
+    api('com.google.android.exoplayer:exoplayer-hls:' + exoPlayerVersion) {
         exclude group: 'com.android.support'
     }
-    compile('com.google.android.exoplayer:exoplayer-smoothstreaming:' + exoPlayerVersion) {
+    api('com.google.android.exoplayer:exoplayer-smoothstreaming:' + exoPlayerVersion) {
         exclude group: 'com.android.support'
     }
-    provided 'com.android.support:support-v4:28.0.0'
+    compileOnly 'com.android.support:support-v4:28.0.0'
 }
 
 apply from: "${rootDir}/publish.gradle"

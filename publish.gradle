@@ -3,8 +3,8 @@ apply plugin: 'bintray-release'
 publish {
     userOrg = "a-liya" // bintray.com 用户名
     groupId = "com.aliya" // jcenter上的路径
-    artifactId = publishArtifact
-    publishVersion = publishVersion // 版本号
-    desc = publishDesc
-    website = publishWebsite
+    artifactId = 'android-player'
+    publishVersion = version_name // 版本号
+    desc = '一个基于ExoPlayer封装过的Android player'
+    website = 'https://github.com/a-liYa/Player'
 }

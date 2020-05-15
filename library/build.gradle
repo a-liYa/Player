@@ -1,21 +1,19 @@
 apply plugin: 'com.android.library'
 
-def vCode = 45
-def vName = '0.4.5.h24'
 def exoPlayerVersion = 'r2.5.2'
+ext {
+    version_code = 45
+    version_name = '0.4.5.h24'
+}
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 28
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 25
-        versionCode vCode
-        versionName vName
-
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
+        targetSdkVersion 28
+        versionCode version_code
+        versionName version_name
     }
     buildTypes {
         release {
@@ -40,14 +38,7 @@ dependencies {
     compile('com.google.android.exoplayer:exoplayer-smoothstreaming:' + exoPlayerVersion) {
         exclude group: 'com.android.support'
     }
-    provided 'com.android.support:support-v4:25.3.1'
-}
-
-ext {
-    publishArtifact = 'android-player'
-    publishVersion = vName // 发布到Jcenter的版本号
-    publishDesc = '一个基于ExoPlayer封装过的Android player'
-    publishWebsite = 'https://github.com/a-liYa/Player'
+    provided 'com.android.support:support-v4:28.0.0'
 }
 
 apply from: "${rootDir}/publish.gradle"

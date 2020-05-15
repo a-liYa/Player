@@ -8,7 +8,7 @@ package com.aliya.player.simple;
 public class VideoUrls {
 
     private static String[] URLS = {
-            "http://api.zjol.com.cn/api/video/140270?avaliable=hd",
+            "https://v-cdn.zjol.com.cn/286977.mp4?isVertical=1",
             "http://api.zjol.com.cn/api/video/140270?avaliable=hd",
             "http://api.zjol.com.cn/api/video/140270?avaliable=hd",
             "http://cdn.v.zjol.com.cn/151999.mp4",

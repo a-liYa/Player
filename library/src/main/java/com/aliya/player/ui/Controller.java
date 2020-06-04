@@ -373,7 +373,8 @@ public class Controller {
         }
 
         @Override
-        public void onPositionDiscontinuity() { // position 不连续
+        public void onPositionDiscontinuity(int reason) {
+            // position 不连续
             if (navBarControl != null) {
                 navBarControl.updateProgress();
             }
@@ -385,7 +386,7 @@ public class Controller {
         }
 
         @Override
-        public void onTimelineChanged(Timeline timeline, Object manifest) {
+        public void onTimelineChanged(Timeline timeline, int reason) {
             if (navBarControl != null) {
                 navBarControl.updateProgress();
             }

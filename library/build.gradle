@@ -1,6 +1,6 @@
 apply plugin: 'com.android.library'
 
-def exoPlayerVersion = 'r2.5.2'
+def exoPlayerVersion = '2.11.3'
 ext {
     version_code = 46
     version_name = '0.4.6.h24'
@@ -10,7 +10,7 @@ android {
     compileSdkVersion 28
 
     defaultConfig {
-        minSdkVersion 14
+        minSdkVersion 16
         targetSdkVersion 28
         versionCode version_code
         versionName version_name
@@ -20,6 +20,10 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 

@@ -5,16 +5,12 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Handler;
-import android.text.TextUtils;
 
 import com.google.android.exoplayer2.C;
-import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
-import com.google.android.exoplayer2.source.ExtractorMediaSource;
 import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.ProgressiveMediaSource;
 import com.google.android.exoplayer2.source.dash.DashMediaSource;
-import com.google.android.exoplayer2.source.dash.DefaultDashChunkSource;
 import com.google.android.exoplayer2.source.hls.HlsMediaSource;
-import com.google.android.exoplayer2.source.smoothstreaming.DefaultSsChunkSource;
 import com.google.android.exoplayer2.source.smoothstreaming.SsMediaSource;
 import com.google.android.exoplayer2.upstream.DataSource;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
@@ -57,30 +53,25 @@ public class PlayerHelper {
         return userAgent;
     }
 
-    public MediaSource buildMediaSource(Uri uri, String overrideExtension, DefaultBandwidthMeter
-            bandwidthMeter) {
-        int type = TextUtils.isEmpty(overrideExtension) ? Util.inferContentType(uri)
-                : Util.inferContentType("." + overrideExtension);
+    public MediaSource buildMediaSource(Uri uri) {
+        DataSource.Factory dataSourceFactory = new DefaultDataSourceFactory(context, userAgent);
+        @C.ContentType int type = Util.inferContentType(uri);
         switch (type) {
-            case C.TYPE_SS:
-                return new SsMediaSource(uri, buildDataSourceFactory(bandwidthMeter),
-                        new DefaultSsChunkSource.Factory(buildDataSourceFactory(bandwidthMeter)),
-                        mainHandler, null);
             case C.TYPE_DASH:
-                return new DashMediaSource(uri, buildDataSourceFactory(bandwidthMeter),
-                        new DefaultDashChunkSource.Factory(buildDataSourceFactory(bandwidthMeter)),
-                        mainHandler,
-                        null);
+                return new DashMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(uri);
+            case C.TYPE_SS:
+                return new SsMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(uri);
             case C.TYPE_HLS:
-                return new HlsMediaSource(uri, buildDataSourceFactory(bandwidthMeter), mainHandler,
-                        null);
+                return new HlsMediaSource.Factory(dataSourceFactory)
+                        .createMediaSource(uri);
             case C.TYPE_OTHER:
-                return new ExtractorMediaSource(uri, buildDataSourceFactory(bandwidthMeter), new
-                        DefaultExtractorsFactory(),
-                        mainHandler, null);
-            default: {
+                return new ProgressiveMediaSource.Factory(dataSourceFactory)
+                        .setContinueLoadingCheckIntervalBytes(0)
+                        .createMediaSource(uri);
+            default:
                 throw new IllegalStateException("Unsupported type: " + type);
-            }
         }
     }
 

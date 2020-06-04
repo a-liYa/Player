@@ -35,15 +35,12 @@ import com.aliya.player.utils.Utils;
 import com.google.android.exoplayer2.ExoPlayerFactory;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
-import com.google.android.exoplayer2.text.Cue;
-import com.google.android.exoplayer2.text.TextRenderer;
 import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.TrackSelection;
 import com.google.android.exoplayer2.upstream.DefaultBandwidthMeter;
 
 import java.lang.ref.SoftReference;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 import static android.view.ViewGroup.LayoutParams.MATCH_PARENT;
@@ -162,7 +159,7 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
 
         setPlayer(player);
 
-        MediaSource videoSource = helper.buildMediaSource(Uri.parse(url), null, bandwidthMeter);
+        MediaSource videoSource = helper.buildMediaSource(Uri.parse(url));
 
         // 3. 准备播放.
         player.prepare(videoSource);
@@ -220,7 +217,6 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
         }
 
         if (this.player != null) {
-            this.player.removeTextOutput(componentListener);
             this.player.removeVideoListener(componentListener);
 
             if (surfaceView instanceof SurfaceView) {
@@ -243,7 +239,6 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
             }
 
             player.addVideoListener(componentListener);
-            player.addTextOutput(componentListener);
         }
     }
 
@@ -261,7 +256,6 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
                 controller.setPlayer(null);
             }
 
-            player.removeTextOutput(componentListener);
             player.removeVideoListener(componentListener);
             if (surfaceView instanceof SurfaceView) {
                 player.clearVideoSurfaceView((SurfaceView) surfaceView);
@@ -429,16 +423,7 @@ public class PlayerView extends FrameLayout implements ViewTreeObserver.OnPreDra
         getViewTreeObserver().removeOnPreDrawListener(this);
     }
 
-    private final class ComponentListener implements SimpleExoPlayer.VideoListener,
-            TextRenderer.Output {
-
-        // TextRenderer.Output implementation
-        @Override
-        public void onCues(List<Cue> cues) {
-//            if (subtitleView != null) {
-//                subtitleView.onCues(cues);
-//            }
-        }
+    private final class ComponentListener implements SimpleExoPlayer.VideoListener{
 
         // SimpleExoPlayer.VideoListener implementation
         @Override

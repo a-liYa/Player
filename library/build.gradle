@@ -2,8 +2,8 @@ apply plugin: 'com.android.library'
 
 def exoPlayerVersion = '2.11.7'
 ext {
-    version_code = 47
-    version_name = '0.4.7.h24'
+    version_code = 100
+    version_name = '1.0.0.h24'
 }
 
 android {

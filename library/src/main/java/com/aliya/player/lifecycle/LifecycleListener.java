@@ -1,6 +1,6 @@
 package com.aliya.player.lifecycle;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 /**
  * 视频生命周期监听 - 接口

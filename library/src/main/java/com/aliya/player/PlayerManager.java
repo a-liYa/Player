@@ -5,7 +5,7 @@ import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.os.SystemClock;
 import android.provider.Settings;
-import android.support.v4.content.LocalBroadcastManager;
+import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;

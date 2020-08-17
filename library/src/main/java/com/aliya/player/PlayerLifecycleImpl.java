@@ -1,6 +1,6 @@
 package com.aliya.player;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.aliya.player.lifecycle.LifecycleListener;
 import com.aliya.player.ui.PlayerView;

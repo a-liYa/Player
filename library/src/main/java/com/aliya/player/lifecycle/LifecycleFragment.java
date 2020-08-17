@@ -2,7 +2,7 @@ package com.aliya.player.lifecycle;
 
 import android.app.Fragment;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 /**
  * 视频生命周期管理 Fragment

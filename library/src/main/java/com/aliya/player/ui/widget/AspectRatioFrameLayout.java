@@ -16,7 +16,7 @@
 package com.aliya.player.ui.widget;
 
 import android.content.Context;
-import android.support.annotation.IntDef;
+import androidx.annotation.IntDef;
 import android.util.AttributeSet;
 import android.widget.FrameLayout;
 
